@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a2a4d" id="themeColorMeta">
+<title>عظيمو الجبل — احسب بلاطك بسهولة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-deep:#0a2a4d;
+    --navy:#123f77;
+    --navy-light:#1b5aa3;
+    --blue:#1665c9;
+    --green:#1f9d5a;
+    --green-dark:#187e48;
+    --amber:#e8a33d;
+    --bg:#eef1f6;
+    --card:#ffffff;
+    --text:#152238;
+    --muted:#6c7a90;
+    --border:#e2e7f0;
+    --shadow: 0 10px 26px rgba(10,42,77,0.10);
+    --radius:16px;
+    --safe-top: max(14px, env(safe-area-inset-top));
+  }
+  [data-theme="dark"]{
+    --bg:#0b1524;
+    --card:#101d33;
+    --text:#eef2f9;
+    --muted:#8b9ab3;
+    --border:#20304a;
+    --shadow: 0 10px 26px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 500px at 50% -10%, #1b5aa322, transparent),
+      var(--bg);
+    font-family:'Tajawal','Cairo',Tahoma,Arial,sans-serif;
+    color:var(--text);
+    display:flex;
+    justify-content:center;
+  }
+  .device{
+    width:100%;
+    max-width:480px;
+    min-height:100dvh;
+    background:var(--bg);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .screen{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    background:var(--bg);
+    opacity:0; visibility:hidden;
+    transform:translateX(16px);
+    transition:opacity .28s ease, transform .28s ease;
+  }
+  .screen.active{
+    opacity:1; visibility:visible; transform:translateX(0);
+    z-index:10;
+  }
+  .screen-body{ flex:1; overflow-y:auto; -ms-overflow-style:none; scrollbar-width:none; }
+  .screen-body::-webkit-scrollbar{display:none;}
+
+  /* ---------- Header ---------- */
+  .topbar{
+    padding-top: var(--safe-top);
+    background:linear-gradient(160deg, var(--navy-deep), var(--navy) 60%, var(--navy-light));
+    color:#fff;
+    display:flex; align-items:center; gap:10px;
+    padding-inline:16px; padding-bottom:14px;
+    position:relative;
+    flex-shrink:0;
+  }
+  .topbar .back{
+    width:34px;height:34px;border-radius:10px;
+    background:rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer; border:none; color:#fff; flex-shrink:0;
+  }
+  .topbar .back svg{width:18px;height:18px;}
+  .topbar h1{
+    font-family:'Cairo',sans-serif; font-weight:700; font-size:16.5px;
+    margin:0; flex:1; text-align:center; padding-inline-end:34px;
+  }
+  .topbar .icon-btn{
+    width:34px;height:34px;border-radius:10px;
+    background:rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff; border:none; cursor:pointer; flex-shrink:0;
+  }
+
+  /* ---------- Splash ---------- */
+  #screen-splash .screen-body{
+    background:
+      linear-gradient(180deg, rgba(10,20,40,0.15) 0%, rgba(10,20,40,0.35) 55%, rgba(10,20,40,0.75) 100%),
+      url('https://i.ibb.co/HTtw0LPd/81b896de2498.jpg') center/cover no-repeat;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:#fff; text-align:center; padding:32px;
+    position:relative; overflow:hidden;
+  }
+  .sun{
+    position:absolute; top:18%; left:50%; transform:translateX(-50%);
+    width:70px; height:70px; border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #ffe9b0, #f0a83d 70%);
+    box-shadow:0 0 60px 18px rgba(240,168,61,0.55);
+  }
+  .brand-mark{ position:relative; z-index:2; margin-bottom:18px;}
+  .brand-mark svg{ width:150px; height:110px; filter:drop-shadow(0 8px 18px rgba(0,0,0,0.35)); }
+  .brand-title{ font-family:'Cairo',sans-serif; font-weight:800; font-size:30px; margin:6px 0 10px; position:relative; z-index:2; text-shadow:0 2px 14px rgba(0,0,0,0.55);}
+  .brand-sub{ font-size:15px; color:#eaf1ff; line-height:1.9; max-width:260px; position:relative; z-index:2; text-shadow:0 1px 10px rgba(0,0,0,0.55);}
+  .splash-loader{
+    position:absolute; bottom:56px; left:0; right:0;
+    display:flex; flex-direction:column; align-items:center; gap:10px; z-index:2;
+  }
+  .spinner{ width:20px;height:20px;border-radius:50%; border:3px solid rgba(255,255,255,0.35); border-top-color:#fff; animation:spin 0.9s linear infinite;}
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+  .splash-loader span{ font-size:12.5px; color:#e9eefc; }
+
+  /* ---------- Home ---------- */
+  .home-hero{
+    margin:16px; padding:22px 18px 26px;
+    border-radius:20px;
+    background:linear-gradient(155deg, var(--navy-deep), var(--navy) 70%);
+    color:#fff; text-align:center;
+    box-shadow: var(--shadow);
+  }
+  .home-hero .logo-row{ display:flex; justify-content:center; margin-bottom:8px;}
+  .home-hero .logo-row svg{ width:64px; height:48px; }
+  .home-hero .made-by{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin:0 0 10px; padding:0 6px;
+  }
+  .home-hero .made-by::before, .home-hero .made-by::after{
+    content:''; flex:1; height:1px; max-width:38px;
+    background:linear-gradient(90deg, transparent, rgba(232,163,61,.75));
+  }
+  .home-hero .made-by::after{ background:linear-gradient(90deg, rgba(232,163,61,.75), transparent); }
+  .home-hero .made-by .mb-deco{
+    color:#f0c375; font-size:10px; line-height:1; flex-shrink:0;
+    text-shadow:0 0 6px rgba(232,163,61,.6);
+  }
+  .home-hero .made-by .mb-text{
+    font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; letter-spacing:.3px;
+    white-space:nowrap;
+    color:#f5cd85;
+    text-shadow:0 0 10px rgba(232,163,61,.55), 0 1px 2px rgba(0,0,0,.35);
+  }
+  .home-hero h2{ font-family:'Cairo',sans-serif; font-weight:800; font-size:21px; margin:6px 0 4px;}
+  .home-hero p{ margin:0; font-size:13px; color:#dbe6f7; line-height:1.7; }
+
+  .home-actions{ padding:4px 16px 8px; display:flex; flex-direction:column; gap:14px; }
+  .big-btn{
+    border:none; border-radius:16px; padding:18px 16px;
+    display:flex; align-items:center; gap:14px;
+    font-family:'Cairo',sans-serif; font-weight:700; font-size:15.5px;
+    color:#fff; cursor:pointer; box-shadow:var(--shadow);
+  }
+  .big-btn .ic{
+    width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.2);
+    display:flex;align-items:center;justify-content:center; flex-shrink:0;
+  }
+  .big-btn .txt{ text-align:right; flex:1; }
+  .big-btn .txt small{ display:block; font-family:'Tajawal',sans-serif; font-weight:400; font-size:12px; opacity:0.85; margin-top:3px;}
+  .btn-camera{ background:linear-gradient(135deg, var(--blue), #0e4fa3); }
+  .btn-gallery{ background:linear-gradient(135deg, var(--green), var(--green-dark)); }
+
+  .home-quick{
+    display:flex; gap:10px; padding:6px 16px 20px; margin-top:auto;
+  }
+  .quick-card{
+    flex:1; background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:14px 6px; text-align:center; cursor:pointer; color:var(--text);
+  }
+  .quick-card .ic{ width:34px;height:34px;border-radius:10px;background:#eef3fb; margin:0 auto 8px; display:flex;align-items:center;justify-content:center; color:var(--navy);}
+  [data-theme="dark"] .quick-card .ic{ background:#1a2c47; }
+  .quick-card span{ font-size:11.5px; font-weight:700; }
+
+  /* ---------- Camera screen ---------- */
+  #screen-camera .screen-body{ background:#0b1220; display:flex; flex-direction:column; }
+  .cam-view{
+    flex:1; margin:14px; border-radius:18px; overflow:hidden; position:relative;
+    background:#111a2b; display:flex; align-items:center; justify-content:center;
+  }
+  .cam-view video, .cam-view img{ width:100%; height:100%; object-fit:cover; }
+  .cam-frame{
+    position:absolute; inset:22px; border:none; pointer-events:none;
+  }
+  .cam-frame span{ position:absolute; width:26px; height:26px; border-color:#fff; }
+  .cam-frame span.tl{ top:0;left:0;border-top:3px solid #fff;border-right:3px solid #fff; border-radius:6px 0 0 0;}
+  .cam-frame span.tr{ top:0;right:0;border-top:3px solid #fff;border-left:3px solid #fff; border-radius:0 6px 0 0;}
+  .cam-frame span.bl{ bottom:0;left:0;border-bottom:3px solid #fff;border-right:3px solid #fff; border-radius:0 0 0 6px;}
+  .cam-frame span.br{ bottom:0;right:0;border-bottom:3px solid #fff;border-left:3px solid #fff; border-radius:0 0 6px 0;}
+  .cam-hint{
+    position:absolute; bottom:14px; left:0; right:0; text-align:center;
+    color:#fff; font-size:12px; background:rgba(0,0,0,0.35); padding:6px 0;
+  }
+  .cam-controls{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 34px 30px;
+  }
+  .cam-side-btn{
+    width:44px;height:44px;border-radius:12px; border:none; background:#1b2740; color:#fff;
+    display:flex; align-items:center;justify-content:center; cursor:pointer;
+  }
+  .cam-side-btn.on{ background:var(--amber); color:#1a1204; }
+  .shutter{
+    width:70px;height:70px;border-radius:50%; background:#fff; border:5px solid #3a475f; cursor:pointer;
+  }
+  .shutter:active{ background:#dfe6f2; }
+
+  /* ---------- Gallery grid ---------- */
+  .gallery-wrap{ padding:16px; }
+  .gallery-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px;
+  }
+  .swatch{
+    aspect-ratio:1/1; border-radius:14px; position:relative; cursor:pointer;
+    border:3px solid transparent; overflow:hidden; box-shadow:var(--shadow);
+  }
+  .swatch.selected{ border-color:var(--blue); }
+  .swatch .check{
+    position:absolute; top:6px; left:6px; width:20px;height:20px;border-radius:50%;
+    background:var(--blue); color:#fff; display:none; align-items:center;justify-content:center;
+  }
+  .swatch.selected .check{ display:flex; }
+  .swatch .lbl{
+    position:absolute; bottom:0; right:0; left:0; padding:5px 8px;
+    background:linear-gradient(0deg, rgba(0,0,0,0.55), transparent);
+    color:#fff; font-size:10.5px; font-weight:700; text-align:center;
+  }
+  .sw-marble-beige{ background: repeating-linear-gradient(120deg,#e8e1d3 0 2px, #ded5c2 2px 60px), linear-gradient(135deg,#efe9dc,#dcd3c0); }
+  .sw-graphite{ background: linear-gradient(135deg,#5a6270,#383e49); }
+  .sw-sand{ background: radial-gradient(circle at 30% 30%, #e7d3ac, #cbb083 90%); }
+  .sw-slate{ background: linear-gradient(135deg,#3a4048,#20242b); }
+  .sw-terrazzo{ background:
+      radial-gradient(circle at 20% 30%, #d98b8b 0 6px, transparent 7px),
+      radial-gradient(circle at 60% 60%, #7fae8f 0 5px, transparent 6px),
+      radial-gradient(circle at 80% 20%, #c9a24a 0 5px, transparent 6px),
+      radial-gradient(circle at 40% 80%, #6b90c9 0 4px, transparent 5px),
+      #e9e6df; }
+  .sw-wood{ background: repeating-linear-gradient(90deg,#a9764a 0 10px,#96633a 10px 20px); }
+  .sw-lightgray{ background: linear-gradient(135deg,#d7dbe1,#b9c0c9); }
+  .sw-hex{ background:
+      conic-gradient(from 0deg, #cfd6dd 0 60deg, #e4e9ee 0 120deg, #cfd6dd 0 180deg, #e4e9ee 0 240deg, #cfd6dd 0 300deg, #e4e9ee 0 360deg);
+      background-size: 22px 22px; }
+  .sw-marble-gray{ background: repeating-linear-gradient(60deg,#eef0f2 0 2px,#dfe3e7 2px 40px), linear-gradient(135deg,#f2f3f5,#e2e5e9); }
+
+  /* ---------- Buttons generic ---------- */
+  .btn-primary{
+    width:100%; border:none; border-radius:14px; padding:15px; font-family:'Cairo',sans-serif;
+    font-weight:700; font-size:15px; color:#fff; background:linear-gradient(135deg,var(--blue),#0e4fa3);
+    cursor:pointer; box-shadow:var(--shadow);
+  }
+  .btn-primary:disabled{ opacity:0.5; cursor:not-allowed; }
+  .btn-outline{
+    width:100%; border:1.6px solid var(--blue); border-radius:14px; padding:14px; font-family:'Cairo',sans-serif;
+    font-weight:700; font-size:14.5px; color:var(--blue); background:transparent; cursor:pointer;
+  }
+  .bottom-pad{ padding:14px 16px 22px; }
+
+  /* ---------- Analysis screen ---------- */
+  .analysis-wrap{ padding:16px; display:flex; flex-direction:column; align-items:center; }
+  .analysis-img{
+    width:100%; aspect-ratio:4/3.1; border-radius:16px; overflow:hidden; box-shadow:var(--shadow); margin-bottom:26px;
+  }
+  .analysis-img div{ width:100%;height:100%; }
+  .ring-wrap{ position:relative; width:150px;height:150px; margin-bottom:14px; }
+  .ring-wrap svg{ width:100%;height:100%; transform:rotate(-90deg);}
+  .ring-bg{ fill:none; stroke:var(--border); stroke-width:10; }
+  .ring-fg{ fill:none; stroke:var(--blue); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset .15s linear; }
+  .ring-label{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .ring-label b{ font-family:'Cairo',sans-serif; font-size:26px; color:var(--navy); }
+  [data-theme="dark"] .ring-label b{ color:#8fc0ff; }
+  .analysis-status{ font-weight:700; font-size:14.5px; margin-bottom:2px; }
+  .analysis-sub{ color:var(--muted); font-size:12.5px; }
+
+  /* ---------- Form (room dimensions) ---------- */
+  .form-card{ background:var(--card); margin:16px; border-radius:16px; padding:18px; box-shadow:var(--shadow); }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:7px; }
+  .field .input-row{ display:flex; align-items:center; background:var(--bg); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .field input{
+    flex:1; border:none; background:transparent; padding:13px 14px; font-size:15px; color:var(--text);
+    font-family:'Tajawal',sans-serif; text-align:right;
+  }
+  .field .input-row:focus-within{ outline:2px solid var(--blue); outline-offset:1px; }
+  .field .unit{ padding:0 14px; color:var(--muted); font-size:12.5px; font-weight:700; border-inline-start:1px solid var(--border); align-self:stretch; display:flex; align-items:center; }
+  .tile-size-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tile-chip{
+    padding:9px 14px; border-radius:20px; border:1.4px solid var(--border); font-size:12.5px; font-weight:700;
+    background:var(--card); color:var(--text); cursor:pointer;
+  }
+  .tile-chip.active{ background:var(--blue); border-color:var(--blue); color:#fff; }
+  .tile-chip.small{ padding:7px 11px; font-size:11.5px; }
+  .dims-row2{ display:flex; gap:8px; margin-top:8px; }
+  .dims-row2 .input-row{ flex:1; }
+
+  /* ---------- Result detail (screen 6) ---------- */
+  .result-hero-img{ margin:16px; border-radius:16px; overflow:hidden; aspect-ratio:16/10; box-shadow:var(--shadow); }
+  .result-hero-img div{ width:100%;height:100%; }
+  .detail-list{ padding:0 16px; display:flex; flex-direction:column; gap:10px; }
+  .detail-row{
+    display:flex; align-items:center; gap:12px; background:var(--card); border-radius:14px; padding:13px 14px;
+    border:1px solid var(--border);
+  }
+  .detail-row .ic{ width:38px;height:38px;border-radius:10px; background:#eaf1fd; display:flex;align-items:center;justify-content:center; color:var(--blue); flex-shrink:0;}
+  [data-theme="dark"] .detail-row .ic{ background:#152540; }
+  .detail-row .lbl{ flex:1; font-size:13px; color:var(--muted); }
+  .detail-row .val{ font-family:'Cairo',sans-serif; font-weight:700; font-size:14.5px; }
+
+  /* ---------- Final result (screen 7) ---------- */
+  .stat-card{
+    margin:12px 16px 0; border-radius:16px; padding:18px; display:flex; align-items:center; gap:14px;
+  }
+  .stat-card.green{ background:#e6f7ec; border:1px solid #bfe9cd; }
+  .stat-card.blue{ background:#e9f1fd; border:1px solid #c6dcf7; }
+  [data-theme="dark"] .stat-card.green{ background:#0f2a1c; border-color:#1c4b30; }
+  [data-theme="dark"] .stat-card.blue{ background:#101f36; border-color:#1d3a5c; }
+  .stat-card .ic{ width:44px;height:44px;border-radius:12px; display:flex;align-items:center;justify-content:center; flex-shrink:0;}
+  .stat-card.green .ic{ background:#1f9d5a; color:#fff; }
+  .stat-card.blue .ic{ background:var(--blue); color:#fff; }
+  .stat-card .val{ font-family:'Cairo',sans-serif; font-weight:800; font-size:21px; }
+  .stat-card .lbl{ font-size:12.5px; color:var(--muted); margin-top:2px; }
+
+  .calc-detail{ margin:18px 16px 8px; }
+  .calc-detail h3{ font-size:13px; color:var(--muted); margin:0 0 8px; font-weight:700; }
+  .calc-detail .row{ display:flex; justify-content:space-between; padding:11px 4px; border-bottom:1px solid var(--border); font-size:13.5px; }
+  .calc-detail .row:last-child{ border-bottom:none; }
+  .calc-detail .row b{ font-family:'Cairo',sans-serif; }
+
+  /* ---------- Saved list ---------- */
+  .save-item{
+    display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:11px; margin:0 16px 12px;
+  }
+  .save-item-main{ display:flex; align-items:center; gap:12px; flex:1; min-width:0; cursor:pointer; }
+  .save-item .thumb{ width:52px;height:52px;border-radius:10px; flex-shrink:0; object-fit:cover; }
+  .save-item .info{ flex:1; min-width:0; }
+  .save-item .info .name{ font-family:'Cairo',sans-serif; font-weight:700; font-size:14px; margin-bottom:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .save-item .info .date{ font-size:11.5px; color:var(--muted); }
+  .save-item .meta{ text-align:left; font-size:12px; color:var(--muted); flex-shrink:0; }
+  .save-item .meta b{ display:block; color:var(--text); font-family:'Cairo',sans-serif; font-size:13px; }
+  .save-item .del{
+    width:34px;height:34px;border-radius:10px; background:#fdeceb; color:#d64545; border:none;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer;
+  }
+  [data-theme="dark"] .save-item .del{ background:#3a1c1c; color:#ff8f8f; }
+  .empty-state{ text-align:center; padding:60px 30px; color:var(--muted); }
+  .empty-state .ic{ width:70px;height:70px; margin:0 auto 16px; border-radius:50%; background:var(--card); display:flex;align-items:center;justify-content:center; color:var(--muted);}
+
+  /* ---------- Settings ---------- */
+  .settings-group{ margin:16px; background:var(--card); border-radius:16px; overflow:hidden; border:1px solid var(--border);}
+  .set-row{
+    display:flex; align-items:center; gap:12px; padding:15px 16px; border-bottom:1px solid var(--border); cursor:pointer;
+  }
+  .set-row:last-child{ border-bottom:none; }
+  .set-row .ic{ width:36px;height:36px;border-radius:10px; background:#eaf1fd; display:flex;align-items:center;justify-content:center; color:var(--blue); flex-shrink:0;}
+  [data-theme="dark"] .set-row .ic{ background:#152540; }
+  .set-row .lbl{ flex:1; font-size:14px; font-weight:500; }
+  .set-row .val{ font-size:12px; color:var(--muted); }
+  .set-row .chev{ color:var(--muted); }
+  .switch{ position:relative; width:44px; height:26px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0;height:0; }
+  .slider{ position:absolute; inset:0; background:#c7cedb; border-radius:20px; transition:.2s; cursor:pointer; }
+  .slider:before{ content:""; position:absolute; width:20px;height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+  input:checked + .slider{ background:var(--green); }
+  input:checked + .slider:before{ transform:translateX(-18px); }
+
+  /* ---------- About ---------- */
+  .about-wrap{ text-align:center; padding:26px 20px; }
+  .about-wrap .logo-row svg{ width:78px;height:58px; }
+  .about-wrap h2{ font-family:'Cairo',sans-serif; font-weight:800; margin:12px 0 2px; }
+  .about-wrap .ver{ color:var(--muted); font-size:12.5px; margin-bottom:22px; }
+  .about-links{ display:flex; flex-direction:column; gap:10px; text-align:right; }
+  .about-links a{
+    display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border);
+    border-radius:13px; padding:13px 14px; text-decoration:none; color:var(--text); font-size:13.5px; font-weight:500;
+  }
+  .about-links a .ic{ width:32px;height:32px;border-radius:9px; background:#eaf1fd; display:flex;align-items:center;justify-content:center; color:var(--blue); flex-shrink:0;}
+  [data-theme="dark"] .about-links a .ic{ background:#152540; }
+  .thanks-btn{
+    margin-top:22px; width:100%; border:none; border-radius:13px; padding:14px; font-family:'Cairo',sans-serif;
+    font-weight:700; color:#fff; background:linear-gradient(135deg,var(--blue),#0e4fa3); cursor:pointer;
+  }
+
+  .toast{
+    position:absolute; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:#152238; color:#fff; padding:12px 18px; border-radius:18px; font-size:13px;
+    opacity:0; transition:.25s; z-index:200; box-shadow:0 10px 24px rgba(0,0,0,0.3);
+    display:flex; align-items:center; gap:12px; max-width:88%; line-height:1.6; pointer-events:none;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+  .toast span{ flex:1; }
+  .toast-action{
+    background:none; border:none; color:var(--amber); font-weight:700; font-size:12.5px;
+    cursor:pointer; padding:2px; flex-shrink:0; font-family:'Cairo',sans-serif;
+  }
+
+  input[type=file]{ display:none; }
+  ::selection{ background:var(--blue); color:#fff; }
+
+  button, .swatch, .tile-chip, .quick-card, .save-item-main, .set-row, a{
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:focus-visible, .swatch:focus-visible, .tile-chip:focus-visible,
+  .quick-card:focus-visible, a:focus-visible{
+    outline:2px solid var(--amber); outline-offset:2px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="device" id="device">
+  <!-- ============ SPLASH ============ -->
+  <section class="screen active" id="screen-splash">
+    <div class="screen-body">
+      <h1 class="brand-title">عظيمو الجبل</h1>
+      <p class="brand-sub">احسب بلاطك بسهولة ويدقة عالية</p>
+      <div class="splash-loader">
+        <div class="spinner"></div>
+        <span>جاري التحميل ...</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOME ============ -->
+  <section class="screen" id="screen-home">
+    <div class="screen-body" style="display:flex;flex-direction:column;">
+      <div class="home-hero">
+        <div class="logo-row">
+          <svg viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="20,130 75,45 105,90 130,55 180,130" fill="#ffffff"/>
+            <circle cx="150" cy="35" r="12" fill="#e8a33d"/>
+          </svg>
+        </div>
+        <p class="made-by"><span class="mb-deco">✦</span><span class="mb-text">تم إنشاء التطبيق بوساطة محمود حافظ المحمد المحمود 😎</span><span class="mb-deco">✦</span></p>
+        <h2>عظيمو الجبل</h2>
+        <p>احسب عدد البلاط والمساحة بسهولة</p>
+      </div>
+
+      <div class="home-actions">
+        <button class="big-btn btn-camera" onclick="openCamera()">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="14" r="3.4" stroke="#fff" stroke-width="1.7"/></svg></span>
+          <span class="txt">التقط صورة للبلاط<small>التقط صورة مباشرة</small></span>
+        </button>
+        <button class="big-btn btn-gallery" onclick="nav('screen-gallery')">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#fff" stroke-width="1.7"/><circle cx="8.5" cy="9.5" r="1.6" stroke="#fff" stroke-width="1.5"/><path d="M21 16l-5.5-5.5a1.5 1.5 0 00-2.1 0L4 19" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+          <span class="txt">اختر من المعرض<small>اختر صورة من هاتفك</small></span>
+        </button>
+      </div>
+
+      <div class="home-quick">
+        <div class="quick-card" onclick="nav('screen-settings')">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 13.5a1.7 1.7 0 000-3l1.1-1.9-1.8-1.8-1.9 1.1a1.7 1.7 0 00-3 0L12.8 3H10l-1 4.9a1.7 1.7 0 00-3 0L4.1 6.8 2.3 8.6l1.1 1.9a1.7 1.7 0 000 3L2.3 15.4l1.8 1.8 1.9-1.1a1.7 1.7 0 003 0l1 4.9h2.8l1-4.9a1.7 1.7 0 003 0l1.9 1.1 1.8-1.8-1.1-1.9z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></div>
+          <span>الإعدادات</span>
+        </div>
+        <div class="quick-card" onclick="showToast('صوّر بلاطة، أدخل أبعاد الغرفة، واحصل على العدد المطلوب فورًا')">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.5 9.2a2.5 2.5 0 114.2 1.8c-.7.6-1.7 1.1-1.7 2.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg></div>
+          <span>مساعدة</span>
+        </div>
+        <div class="quick-card" onclick="nav('screen-about')">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><line x1="12" y1="11" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="7.6" r="1.1" fill="currentColor"/></svg></div>
+          <span>حول التطبيق</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CAMERA ============ -->
+  <section class="screen" id="screen-camera">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>التقاط صورة للبلاط</h1>
+    </div>
+    <div class="screen-body">
+      <div class="cam-view" id="camView">
+        <video id="camVideo" autoplay playsinline muted></video>
+        <div class="cam-frame">
+          <span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span>
+        </div>
+        <div class="cam-hint" id="camHint">وجّه الكاميرا نحو البلاط ثم اضغط لالتقاط صورة</div>
+      </div>
+      <div class="cam-controls">
+        <button class="cam-side-btn" type="button" aria-label="اختيار صورة من المعرض" onclick="document.getElementById('galleryFileInput').click()"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#fff" stroke-width="1.7"/><circle cx="8.5" cy="9.5" r="1.6" stroke="#fff" stroke-width="1.5"/><path d="M21 16l-5.5-5.5a1.5 1.5 0 00-2.1 0L4 19" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+        <button class="shutter" type="button" aria-label="التقاط صورة" onclick="captureShot()"></button>
+        <button class="cam-side-btn" type="button" id="flashBtn" aria-label="الفلاش" onclick="toggleFlash()"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GALLERY / TILE PICK ============ -->
+  <section class="screen" id="screen-gallery">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>اختر من المعرض</h1>
+    </div>
+    <div class="screen-body">
+      <div class="gallery-wrap">
+        <div class="gallery-grid" id="galleryGrid"></div>
+        <button class="btn-primary" onclick="confirmGalleryChoice()">اختيار الصورة</button>
+        <div style="text-align:center;margin-top:14px;">
+          <button class="btn-outline" style="width:auto;padding:10px 18px;font-size:13px;" onclick="document.getElementById('galleryFileInput').click()">أو ارفع صورة من الهاتف</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ANALYSIS ============ -->
+  <section class="screen" id="screen-analysis">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>تحليل الصورة</h1>
+    </div>
+    <div class="screen-body">
+      <div class="analysis-wrap">
+        <div class="analysis-img"><div id="analysisImg"></div></div>
+        <div class="ring-wrap">
+          <svg viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="50"></circle>
+            <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314"></circle>
+          </svg>
+          <div class="ring-label"><b id="ringPct">0%</b></div>
+        </div>
+        <div class="analysis-status" id="analysisStatus">جاري تحليل البلاط...</div>
+        <div class="analysis-sub">يرجى الانتظار</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ROOM DIMENSIONS ============ -->
+  <section class="screen" id="screen-dims">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>أبعاد الغرفة</h1>
+    </div>
+    <div class="screen-body">
+      <div class="form-card">
+        <div class="field">
+          <label>اسم المكان</label>
+          <div class="input-row"><input id="roomName" type="text" value="غرفة" placeholder="مثال: مطبخ"></div>
+        </div>
+        <div class="field">
+          <label>طول المكان</label>
+          <div class="input-row"><input id="roomLength" type="number" inputmode="decimal" value="4"><span class="unit">متر</span></div>
+        </div>
+        <div class="field">
+          <label>عرض المكان</label>
+          <div class="input-row"><input id="roomWidth" type="number" inputmode="decimal" value="4"><span class="unit">متر</span></div>
+        </div>
+        <div class="field">
+          <label>شكل البلاطة</label>
+          <div class="tile-size-row" id="tileShapeRow">
+            <div class="tile-chip active" data-shape="square">مربّع</div>
+            <div class="tile-chip" data-shape="rect">مستطيل</div>
+            <div class="tile-chip" data-shape="triangle">مثلث</div>
+            <div class="tile-chip" data-shape="other">آخر</div>
+          </div>
+        </div>
+
+        <div class="field" id="squareSizeField" style="margin-bottom:4px;">
+          <label>مقاس البلاطة الواحدة</label>
+          <div class="tile-size-row" id="tileSizeRow">
+            <div class="tile-chip" data-size="30">30×30 سم</div>
+            <div class="tile-chip active" data-size="60">60×60 سم</div>
+            <div class="tile-chip" data-size="80">80×80 سم</div>
+            <div class="tile-chip" data-size="100">100×100 سم</div>
+            <div class="tile-chip" data-size="custom">مقاس آخر</div>
+          </div>
+          <div class="input-row" id="squareCustomRow" style="display:none;margin-top:8px;">
+            <input id="squareCustomSize" type="number" inputmode="decimal" placeholder="أدخل طول الضلع">
+            <span class="unit">سم</span>
+          </div>
+        </div>
+
+        <div class="field" id="rectSizeField" style="display:none;margin-bottom:4px;">
+          <label>أبعاد البلاطة (مستطيل)</label>
+          <div class="tile-size-row" id="rectPresetRow">
+            <div class="tile-chip" data-w="30" data-h="60">30×60 سم</div>
+            <div class="tile-chip" data-w="25" data-h="50">25×50 سم</div>
+            <div class="tile-chip" data-w="20" data-h="40">20×40 سم</div>
+            <div class="tile-chip" data-w="custom" data-h="custom">مقاس آخر</div>
+          </div>
+          <div class="dims-row2" id="rectCustomRow" style="display:none;">
+            <div class="input-row"><input id="rectLen" type="number" inputmode="decimal" placeholder="الطول"><span class="unit">سم</span></div>
+            <div class="input-row"><input id="rectWid" type="number" inputmode="decimal" placeholder="العرض"><span class="unit">سم</span></div>
+          </div>
+        </div>
+
+        <div class="field" id="triSizeField" style="display:none;margin-bottom:4px;">
+          <label>أبعاد البلاطة (مثلث)</label>
+          <div class="dims-row2">
+            <div class="input-row"><input id="triBase" type="number" inputmode="decimal" placeholder="القاعدة"><span class="unit">سم</span></div>
+            <div class="input-row"><input id="triHeight" type="number" inputmode="decimal" placeholder="الارتفاع"><span class="unit">سم</span></div>
+          </div>
+        </div>
+
+        <div class="field" id="otherSizeField" style="display:none;margin-bottom:4px;">
+          <label>مساحة البلاطة الواحدة</label>
+          <div class="input-row"><input id="otherArea" type="number" inputmode="decimal" placeholder="مثال: 900"><span class="unit">سم²</span></div>
+        </div>
+      </div>
+      <div class="bottom-pad">
+        <button class="btn-primary" onclick="runCalculation()">احسب النتيجة</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULT DETAILS (screen 6) ============ -->
+  <section class="screen" id="screen-detail">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>تفاصيل التحليل</h1>
+    </div>
+    <div class="screen-body">
+      <div class="result-hero-img"><div id="detailImg"></div></div>
+      <div class="detail-list">
+        <div class="detail-row"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M4 12h16M12 4v16" stroke="currentColor" stroke-width="1.7"/></svg></span><span class="lbl">نوع البلاط</span><span class="val" id="dTileType">مربّع</span></div>
+        <div class="detail-row"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="8" width="18" height="8" rx="1.5" transform="rotate(-8 12 12)" stroke="currentColor" stroke-width="1.7"/><path d="M7 9l1 2M11 8.4l1 2M15 7.8l1 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span class="lbl">أبعاد البلاطة</span><span class="val" id="dTileDims">60 × 60 سم</span></div>
+        <div class="detail-row"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="5" y="5" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.7"/></svg></span><span class="lbl">مساحة البلاطة الواحدة</span><span class="val" id="dTileArea">0.36 م²</span></div>
+      </div>
+      <div class="bottom-pad">
+        <button class="btn-primary" onclick="nav('screen-result')">متابعة</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL RESULT (screen 7) ============ -->
+  <section class="screen" id="screen-result">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>النتيجة النهائية</h1>
+    </div>
+    <div class="screen-body">
+      <div class="stat-card green">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1.4" fill="#fff"/><rect x="13" y="3" width="8" height="8" rx="1.4" fill="#fff" opacity="0.75"/><rect x="3" y="13" width="8" height="8" rx="1.4" fill="#fff" opacity="0.75"/><rect x="13" y="13" width="8" height="8" rx="1.4" fill="#fff" opacity="0.55"/></svg></span>
+        <div><div class="val" id="rTileCount">42 بلاطة</div><div class="lbl">عدد البلاط المطلوب</div></div>
+      </div>
+      <div class="stat-card blue">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#fff" stroke-width="1.7"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18" stroke="#fff" stroke-width="1.3"/></svg></span>
+        <div><div class="val" id="rTotalArea">15.2 م²</div><div class="lbl">المساحة الكلية</div></div>
+      </div>
+      <div class="calc-detail">
+        <h3>تفاصيل الحساب</h3>
+        <div class="row"><span>مساحة المكان</span><b id="cRoomArea">16.0 م²</b></div>
+        <div class="row"><span>مساحة البلاطة الواحدة</span><b id="cTileArea">0.36 م²</b></div>
+        <div class="row"><span>عدد البلاط (تقريبًا)</span><b id="cTileCount">42 بلاطة</b></div>
+      </div>
+      <div class="bottom-pad" style="display:flex;flex-direction:column;gap:10px;">
+        <button class="btn-outline" onclick="nav('screen-dims')">تعديل الأبعاد وإعادة الحساب</button>
+        <button class="btn-primary" id="resultActionBtn" style="background:linear-gradient(135deg,var(--green),var(--green-dark));" onclick="saveResult()">حفظ النتيجة</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SAVED RESULTS (screen 8) ============ -->
+  <section class="screen" id="screen-saved">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>النتائج المحفوظة</h1>
+      <button class="icon-btn" onclick="clearAllSaved()" aria-label="حذف جميع النتائج المحفوظة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m3 0-1 13a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7h14z" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="screen-body">
+      <div id="savedList" style="padding-top:14px;"></div>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS (screen 9) ============ -->
+  <section class="screen" id="screen-settings">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>الإعدادات</h1>
+    </div>
+    <div class="screen-body">
+      <div class="settings-group">
+        <div class="set-row" onclick="showToast('الوحدة الحالية: المتر / سم')">
+          <span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="8" width="18" height="8" rx="1.5" transform="rotate(-8 12 12)" stroke="currentColor" stroke-width="1.7"/><path d="M7 9l1 2M11 8.4l1 2M15 7.8l1 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span class="lbl">الوحدات</span>
+          <span class="val">متر / سم</span><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <div class="set-row" onclick="showToast('اللغة الحالية: العربية')">
+          <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18" stroke="currentColor" stroke-width="1.5"/></svg></span><span class="lbl">لغة التطبيق</span>
+          <span class="val">العربية</span><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <div class="set-row">
+          <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 10a6 6 0 1112 0c0 4 1.4 5.4 1.4 5.4H4.6S6 14 6 10z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M10 18.5a2 2 0 004 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><span class="lbl">تنبيه الصوت</span>
+          <label class="switch"><input type="checkbox" id="soundToggle" checked aria-label="تفعيل تنبيه الصوت"><span class="slider"></span></label>
+        </div>
+        <div class="set-row" onclick="toggleTheme()">
+          <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8.5 8.5 0 019.5 4 8.5 8.5 0 1020 14.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span><span class="lbl">مظهر التطبيق</span>
+          <span class="val" id="themeVal">الوضع الفاتح</span><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <div class="set-row" onclick="nav('screen-about')">
+          <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><line x1="12" y1="11" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="7.6" r="1.1" fill="currentColor"/></svg></span><span class="lbl">معلومات التطبيق</span>
+          <span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT (screen 10) ============ -->
+  <section class="screen" id="screen-about">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>حول التطبيق</h1>
+    </div>
+    <div class="screen-body">
+      <div class="about-wrap">
+        <div class="logo-row">
+          <svg viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="20,130 75,45 105,90 130,55 180,130" fill="#123f77"/>
+            <circle cx="150" cy="35" r="12" fill="#e8a33d"/>
+          </svg>
+        </div>
+        <h2>عظيمو الجبل</h2>
+        <p style="color:var(--muted);font-size:13px;line-height:1.8;">تطبيق يساعدك على حساب عدد البلاط والمساحة بسهولة ودقة</p>
+        <div class="ver">الإصدار 1.0</div>
+        <div class="about-links">
+          <a href="#" onclick="showToast('صوّر البلاط أو اخترها من المعرض، ثم أدخل أبعاد الغرفة لحساب عدد البلاط والمساحة تلقائيًا'); return false;"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.5 9.2a2.5 2.5 0 114.2 1.8c-.7.6-1.7 1.1-1.7 2.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg></span> مساعدة واستخدام التطبيق</a>
+          <a href="#" onclick="showToast('ميزة التواصل غير متاحة في هذا العرض التجريبي'); return false;"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M4 6.5l8 6 8-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> تواصل معنا</a>
+          <a href="#" onclick="showToast('سياسة الخصوصية غير متاحة في هذا العرض التجريبي'); return false;"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span> سياسة الخصوصية</a>
+        </div>
+        <button class="thanks-btn" onclick="nav('screen-home')">شكرًا لاستخدامك تطبيق عظيمو الجبل</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<input type="file" id="galleryFileInput" accept="image/*">
+
+<script>
+/* ============== APP STATE ============== */
+let history_stack = ['screen-home'];
+let currentImageCSS = 'sw-marble-beige';
+let selectedGallerySwatch = 'sw-marble-beige';
+let currentTileSizeCm = 60;
+let currentTileShape = 'square';
+let rectPreset = {w:30, h:60};
+let lastCalc = null;
+let savedResults = [
+  {name:'مطبخ', date:'2025-09-10 14:32', swatch:'sw-marble-beige', area:15.2, count:42, tileSize:60},
+  {name:'حمام', date:'2025-09-09 11:20', swatch:'sw-hex', area:6.5, count:18, tileSize:30},
+  {name:'صالة', date:'2025-09-08 16:45', swatch:'sw-marble-gray', area:28.0, count:75, tileSize:60}
+];
+savedResults.forEach(r=>{
+  r.tileArea = +(((r.tileSize/100)**2).toFixed(4));
+  r.roomArea = +((r.area/1.08).toFixed(2));
+});
+let viewingSavedIndex = null;
+const soundEnabled = () => document.getElementById('soundToggle').checked;
+
+function beep(){
+  if(!soundEnabled()) return;
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 880; g.gain.value = 0.05;
+    o.start(); o.stop(ctx.currentTime + 0.08);
+  }catch(e){}
+}
+
+function nav(id, replace){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(replace){ history_stack[history_stack.length-1] = id; }
+  else{ history_stack.push(id); }
+  if(id === 'screen-saved') renderSavedList();
+  if(id === 'screen-gallery') renderGalleryGrid();
+  if(id === 'screen-result') updateResultActionButton();
+  refreshAccessibility();
+}
+function goBack(){
+  if(window._analysisTimer){ clearInterval(window._analysisTimer); window._analysisTimer = null; }
+  if(history_stack.length > 1){
+    history_stack.pop();
+    const prev = history_stack[history_stack.length-1];
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(prev).classList.add('active');
+    stopCameraStream();
+  } else {
+    nav('screen-home', true);
+  }
+}
+function showToast(msg, actionLabel, actionFn){
+  const t = document.getElementById('toast');
+  t.innerHTML = '';
+  const span = document.createElement('span');
+  span.textContent = msg;
+  t.appendChild(span);
+  if(actionLabel && actionFn){
+    const btn = document.createElement('button');
+    btn.className = 'toast-action';
+    btn.type = 'button';
+    btn.textContent = actionLabel;
+    btn.onclick = ()=>{ actionFn(); t.classList.remove('show'); clearTimeout(window._toastTimer); };
+    t.appendChild(btn);
+  }
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), actionLabel ? 4200 : 2400);
+}
+
+/* Make clickable non-button elements keyboard accessible (Enter/Space + tab focus) */
+function makeAccessible(selector){
+  document.querySelectorAll(selector).forEach(el=>{
+    if(el.hasAttribute('data-a11y-ready')) return;
+    el.setAttribute('data-a11y-ready','1');
+    el.setAttribute('tabindex','0');
+    if(!el.hasAttribute('role')) el.setAttribute('role','button');
+    el.addEventListener('keydown', e=>{
+      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); el.click(); }
+    });
+  });
+}
+function refreshAccessibility(){
+  makeAccessible('.quick-card, .set-row[onclick], .swatch, .save-item-main');
+}
+
+/* ---------- Splash -> Home ---------- */
+let splashTimer = setTimeout(()=>{ nav('screen-home', true); }, 2400);
+document.getElementById('screen-splash').addEventListener('click', ()=>{
+  clearTimeout(splashTimer);
+  nav('screen-home', true);
+});
+
+/* ---------- Camera ---------- */
+let camStream = null;
+function openCamera(){
+  nav('screen-camera');
+  document.getElementById('camHint').textContent = 'وجّه الكاميرا نحو البلاط ثم اضغط لالتقاط صورة';
+  const video = document.getElementById('camVideo');
+  video.style.display='block';
+  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})
+      .then(stream=>{ camStream = stream; video.srcObject = stream; })
+      .catch(()=>{ document.getElementById('camHint').textContent = 'تعذّر الوصول إلى الكاميرا — اضغط لاختيار صورة بدلاً من ذلك'; });
+  } else {
+    document.getElementById('camHint').textContent = 'الكاميرا غير مدعومة في هذا المتصفح — اضغط لاختيار صورة';
+  }
+}
+function stopCameraStream(){
+  if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+  torchOn = false;
+  const flashBtn = document.getElementById('flashBtn');
+  if(flashBtn) flashBtn.classList.remove('on');
+}
+let torchOn = false;
+async function toggleFlash(){
+  const flashBtn = document.getElementById('flashBtn');
+  if(!camStream){ showToast('شغّل الكاميرا أولاً لاستخدام الفلاش'); return; }
+  const track = camStream.getVideoTracks()[0];
+  const caps = track && track.getCapabilities ? track.getCapabilities() : {};
+  if(caps && caps.torch){
+    try{
+      torchOn = !torchOn;
+      await track.applyConstraints({advanced:[{torch:torchOn}]});
+      flashBtn.classList.toggle('on', torchOn);
+    }catch(e){
+      showToast('تعذّر تفعيل الفلاش على هذا الجهاز');
+    }
+  } else {
+    showToast('الفلاش غير مدعوم على هذا الجهاز أو المتصفح');
+  }
+}
+
+function captureShot(){
+  const video = document.getElementById('camVideo');
+  if(camStream && video.videoWidth){
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video,0,0);
+    const dataUrl = canvas.toDataURL('image/jpeg',0.85);
+    startAnalysis({type:'photo', data:dataUrl});
+    stopCameraStream();
+  } else {
+    document.getElementById('galleryFileInput').click();
+  }
+}
+
+document.getElementById('galleryFileInput').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    startAnalysis({type:'photo', data: ev.target.result});
+    stopCameraStream();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+/* ---------- Gallery swatches ---------- */
+const swatchDefs = [
+  {cls:'sw-marble-beige', label:'رخام بيج'},
+  {cls:'sw-graphite', label:'غرافيت'},
+  {cls:'sw-sand', label:'رملي'},
+  {cls:'sw-slate', label:'أردوازي'},
+  {cls:'sw-terrazzo', label:'تيرازو'},
+  {cls:'sw-wood', label:'خشبي'},
+  {cls:'sw-lightgray', label:'رمادي فاتح'},
+  {cls:'sw-hex', label:'سداسي'},
+  {cls:'sw-marble-gray', label:'رخام رمادي'}
+];
+function renderGalleryGrid(){
+  const grid = document.getElementById('galleryGrid');
+  grid.innerHTML = '';
+  swatchDefs.forEach(sw=>{
+    const div = document.createElement('div');
+    const isSelected = sw.cls===selectedGallerySwatch;
+    div.className = 'swatch ' + sw.cls + (isSelected ? ' selected':'');
+    div.setAttribute('aria-label', sw.label + (isSelected ? '، محدد' : ''));
+    div.setAttribute('aria-pressed', String(isSelected));
+    div.onclick = ()=>{ selectedGallerySwatch = sw.cls; renderGalleryGrid(); };
+    div.innerHTML = `<div class="check">✓</div><div class="lbl">${sw.label}</div>`;
+    grid.appendChild(div);
+  });
+  refreshAccessibility();
+}
+function confirmGalleryChoice(){
+  startAnalysis({type:'swatch', data:selectedGallerySwatch});
+}
+
+/* ---------- Analysis ---------- */
+let tileTypeGuess = 'مربّع';
+function startAnalysis(source){
+  if(source.type==='photo'){
+    currentImageCSS = null;
+    document.getElementById('analysisImg').style.background = `url(${source.data}) center/cover`;
+  } else {
+    currentImageCSS = source.data;
+    document.getElementById('analysisImg').style.background='';
+    document.getElementById('analysisImg').className = source.data;
+  }
+  window._lastImageSource = source;
+  nav('screen-analysis');
+  const ring = document.getElementById('ringFg');
+  const pct = document.getElementById('ringPct');
+  const status = document.getElementById('analysisStatus');
+  const circumference = 314;
+  let p = 0;
+  status.textContent = 'جاري تحليل البلاط...';
+  if(window._analysisTimer) clearInterval(window._analysisTimer);
+  const timer = setInterval(()=>{
+    p += Math.random()*9 + 5;
+    if(p>=100){ p=100; clearInterval(timer);
+      window._analysisTimer = null;
+      status.textContent = 'تم التعرف على البلاط بنجاح';
+      beep();
+      setTimeout(()=>{ nav('screen-dims', true); }, 550);
+    }
+    ring.setAttribute('stroke-dashoffset', circumference - (circumference*p/100));
+    pct.textContent = Math.round(p) + '%';
+  }, 160);
+  window._analysisTimer = timer;
+}
+
+/* ---------- Tile shape switch ---------- */
+const shapeFields = {
+  square: document.getElementById('squareSizeField'),
+  rect: document.getElementById('rectSizeField'),
+  triangle: document.getElementById('triSizeField'),
+  other: document.getElementById('otherSizeField')
+};
+function showShapeField(shape){
+  Object.keys(shapeFields).forEach(k=>{ shapeFields[k].style.display = (k===shape) ? '' : 'none'; });
+}
+document.getElementById('tileShapeRow').addEventListener('click', e=>{
+  const chip = e.target.closest('.tile-chip');
+  if(!chip) return;
+  document.querySelectorAll('#tileShapeRow .tile-chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  currentTileShape = chip.dataset.shape;
+  showShapeField(currentTileShape);
+});
+
+/* ---------- Tile size chips (square) ---------- */
+document.getElementById('tileSizeRow').addEventListener('click', e=>{
+  const chip = e.target.closest('.tile-chip');
+  if(!chip) return;
+  document.querySelectorAll('#tileSizeRow .tile-chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  const customRow = document.getElementById('squareCustomRow');
+  if(chip.dataset.size === 'custom'){
+    customRow.style.display = 'flex';
+  } else {
+    customRow.style.display = 'none';
+    currentTileSizeCm = parseFloat(chip.dataset.size);
+  }
+});
+
+/* ---------- Tile size presets (rectangle) ---------- */
+document.getElementById('rectPresetRow').addEventListener('click', e=>{
+  const chip = e.target.closest('.tile-chip');
+  if(!chip) return;
+  document.querySelectorAll('#rectPresetRow .tile-chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  const customRow = document.getElementById('rectCustomRow');
+  if(chip.dataset.w === 'custom'){
+    customRow.style.display = 'flex';
+  } else {
+    customRow.style.display = 'none';
+    rectPreset = {w:parseFloat(chip.dataset.w), h:parseFloat(chip.dataset.h)};
+  }
+});
+
+/* ---------- Calculation ---------- */
+function runCalculation(){
+  viewingSavedIndex = null;
+  const L = parseFloat(document.getElementById('roomLength').value) || 0;
+  const W = parseFloat(document.getElementById('roomWidth').value) || 0;
+  const name = document.getElementById('roomName').value.trim() || 'غرفة';
+  if(L<=0 || W<=0){ showToast('الرجاء إدخال أبعاد صحيحة للمكان'); return; }
+
+  let tileArea = 0, tileTypeLabel = 'مربّع', tileDimsLabel = '';
+  if(currentTileShape === 'square'){
+    const customChip = document.querySelector('#tileSizeRow .tile-chip[data-size="custom"].active');
+    let sizeCm = currentTileSizeCm;
+    if(customChip){
+      sizeCm = parseFloat(document.getElementById('squareCustomSize').value) || 0;
+      if(sizeCm<=0){ showToast('الرجاء إدخال مقاس صحيح للبلاطة'); return; }
+    }
+    const side = sizeCm/100;
+    tileArea = +(side*side).toFixed(4);
+    tileTypeLabel = 'مربّع';
+    tileDimsLabel = `${sizeCm} × ${sizeCm} سم`;
+  } else if(currentTileShape === 'rect'){
+    const customChip = document.querySelector('#rectPresetRow .tile-chip[data-w="custom"].active');
+    let wCm = rectPreset.w, hCm = rectPreset.h;
+    if(customChip){
+      wCm = parseFloat(document.getElementById('rectLen').value) || 0;
+      hCm = parseFloat(document.getElementById('rectWid').value) || 0;
+      if(wCm<=0 || hCm<=0){ showToast('الرجاء إدخال أبعاد صحيحة للبلاطة'); return; }
+    }
+    tileArea = +((wCm/100)*(hCm/100)).toFixed(4);
+    tileTypeLabel = 'مستطيل';
+    tileDimsLabel = `${wCm} × ${hCm} سم`;
+  } else if(currentTileShape === 'triangle'){
+    const baseCm = parseFloat(document.getElementById('triBase').value) || 0;
+    const heightCm = parseFloat(document.getElementById('triHeight').value) || 0;
+    if(baseCm<=0 || heightCm<=0){ showToast('الرجاء إدخال أبعاد صحيحة للبلاطة'); return; }
+    tileArea = +(((baseCm/100)*(heightCm/100))/2).toFixed(4);
+    tileTypeLabel = 'مثلث';
+    tileDimsLabel = `قاعدة ${baseCm} سم × ارتفاع ${heightCm} سم`;
+  } else {
+    const areaCm2 = parseFloat(document.getElementById('otherArea').value) || 0;
+    if(areaCm2<=0){ showToast('الرجاء إدخال مساحة صحيحة للبلاطة'); return; }
+    tileArea = +(areaCm2/10000).toFixed(4);
+    tileTypeLabel = 'آخر';
+    tileDimsLabel = `مساحة مخصصة`;
+  }
+  if(tileArea<=0){ showToast('الرجاء إدخال أبعاد صحيحة للبلاطة'); return; }
+
+  const roomArea = +(L*W).toFixed(2);
+  const waste = 1.08;
+  const tileCount = Math.ceil((roomArea*waste)/tileArea);
+  const totalArea = +(tileCount*tileArea).toFixed(2);
+
+  lastCalc = {name, roomArea, tileArea, tileCount, totalArea, tileShape:currentTileShape, tileTypeLabel, tileDimsLabel, source: window._lastImageSource};
+
+  // detail screen
+  const detailImg = document.getElementById('detailImg');
+  if(window._lastImageSource && window._lastImageSource.type==='photo'){
+    detailImg.style.background = `url(${window._lastImageSource.data}) center/cover`;
+    detailImg.className='';
+  } else {
+    detailImg.style.background='';
+    detailImg.className = (window._lastImageSource ? window._lastImageSource.data : 'sw-marble-beige');
+  }
+  document.getElementById('dTileType').textContent = tileTypeLabel;
+  document.getElementById('dTileDims').textContent = tileDimsLabel;
+  document.getElementById('dTileArea').textContent = tileArea.toFixed(2) + ' م²';
+
+  // result screen
+  document.getElementById('rTileCount').textContent = tileCount + ' بلاطة';
+  document.getElementById('rTotalArea').textContent = totalArea + ' م²';
+  document.getElementById('cRoomArea').textContent = roomArea.toFixed(1) + ' م²';
+  document.getElementById('cTileArea').textContent = tileArea.toFixed(2) + ' م²';
+  document.getElementById('cTileCount').textContent = tileCount + ' بلاطة';
+
+  beep();
+  nav('screen-detail');
+}
+
+function saveResult(){
+  if(!lastCalc) return;
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const dateStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  savedResults.unshift({
+    name: lastCalc.name,
+    date: dateStr,
+    swatch: (lastCalc.source && lastCalc.source.type==='swatch') ? lastCalc.source.data : null,
+    photo: (lastCalc.source && lastCalc.source.type==='photo') ? lastCalc.source.data : null,
+    area: lastCalc.totalArea,
+    count: lastCalc.tileCount,
+    tileShape: lastCalc.tileShape,
+    tileTypeLabel: lastCalc.tileTypeLabel,
+    tileDimsLabel: lastCalc.tileDimsLabel,
+    roomArea: lastCalc.roomArea,
+    tileArea: lastCalc.tileArea
+  });
+  showToast('تم حفظ النتيجة بنجاح');
+  beep();
+  setTimeout(()=> nav('screen-saved', true), 450);
+}
+
+function renderSavedList(){
+  const list = document.getElementById('savedList');
+  if(savedResults.length===0){
+    list.innerHTML = `<div class="empty-state"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18" stroke="currentColor" stroke-width="1.3"/></svg></div><div>لا توجد نتائج محفوظة بعد</div></div>`;
+    return;
+  }
+  list.innerHTML = savedResults.map((r,i) => `
+    <div class="save-item">
+      <div class="save-item-main" onclick="viewSavedResult(${i})" aria-label="عرض تفاصيل ${escapeHtml(r.name)}">
+        ${r.photo ? `<img class="thumb" src="${r.photo}" alt="">` : `<div class="thumb ${r.swatch || 'sw-marble-beige'}"></div>`}
+        <div class="info">
+          <div class="name">${escapeHtml(r.name)}</div>
+          <div class="date">${r.date}</div>
+        </div>
+      </div>
+      <div class="meta"><b>${r.count} بلاطة</b>${r.area} م²</div>
+      <button class="del" type="button" aria-label="حذف ${escapeHtml(r.name)}" onclick="deleteSavedItem(${i})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m3 0-1 13a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7h14z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  `).join('');
+  refreshAccessibility();
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function deleteSavedItem(index){
+  const removed = savedResults.splice(index,1)[0];
+  renderSavedList();
+  showToast('تم حذف النتيجة', 'تراجع', ()=>{
+    savedResults.splice(index,0,removed);
+    renderSavedList();
+  });
+}
+
+function clearAllSaved(){
+  if(savedResults.length===0){ showToast('لا توجد نتائج لحذفها'); return; }
+  const backup = savedResults.slice();
+  savedResults = [];
+  renderSavedList();
+  showToast('تم حذف جميع النتائج', 'تراجع', ()=>{
+    savedResults = backup;
+    renderSavedList();
+  });
+}
+
+function viewSavedResult(index){
+  const item = savedResults[index];
+  if(!item) return;
+  viewingSavedIndex = index;
+  document.getElementById('rTileCount').textContent = item.count + ' بلاطة';
+  document.getElementById('rTotalArea').textContent = item.area + ' م²';
+  document.getElementById('cRoomArea').textContent = (item.roomArea!=null ? item.roomArea.toFixed(1) : '—') + ' م²';
+  document.getElementById('cTileArea').textContent = (item.tileArea!=null ? item.tileArea.toFixed(2) : '—') + ' م²';
+  document.getElementById('cTileCount').textContent = item.count + ' بلاطة';
+  nav('screen-result');
+}
+
+function updateResultActionButton(){
+  const btn = document.getElementById('resultActionBtn');
+  if(!btn) return;
+  if(viewingSavedIndex !== null){
+    btn.textContent = 'حذف من المحفوظات';
+    btn.style.background = 'linear-gradient(135deg,#e05252,#b83a3a)';
+    btn.onclick = deleteCurrentSavedFromResult;
+  } else {
+    btn.textContent = 'حفظ النتيجة';
+    btn.style.background = 'linear-gradient(135deg,var(--green),var(--green-dark))';
+    btn.onclick = saveResult;
+  }
+}
+
+function deleteCurrentSavedFromResult(){
+  const idx = viewingSavedIndex;
+  if(idx===null) return;
+  const removed = savedResults.splice(idx,1)[0];
+  viewingSavedIndex = null;
+  showToast('تم حذف النتيجة من المحفوظات', 'تراجع', ()=>{
+    savedResults.splice(idx,0,removed);
+    renderSavedList();
+  });
+  nav('screen-saved', true);
+}
+
+/* ---------- Settings ---------- */
+function toggleTheme(){
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  document.getElementById('themeVal').textContent = isDark ? 'الوضع الفاتح' : 'الوضع الداكن';
+  document.getElementById('themeColorMeta').setAttribute('content', isDark ? '#0a2a4d' : '#0b1524');
+}
+
+/* Initial accessibility pass for static markup (home quick-cards, settings rows) */
+refreshAccessibility();
+</script>
+</body>
+</html>
