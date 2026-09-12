@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0a2a4d" id="themeColorMeta">
+<meta name="theme-color" content="#0b1524" id="themeColorMeta">
 <title>عظيمو الجبل — احسب بلاطك بسهولة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
@@ -16,6 +16,8 @@
     --green:#1f9d5a;
     --green-dark:#187e48;
     --amber:#e8a33d;
+    --teal:#149c8f;
+    --teal-dark:#0d6f68;
     --bg:#eef1f6;
     --card:#ffffff;
     --text:#152238;
@@ -97,6 +99,25 @@
     color:#fff; border:none; cursor:pointer; flex-shrink:0;
   }
 
+  .app-banner{
+    padding-top: var(--safe-top);
+    background:linear-gradient(160deg, var(--navy-deep), var(--navy) 60%, var(--navy-light));
+    display:flex; align-items:center; gap:10px;
+    padding-inline:16px; padding-bottom:13px;
+    flex-shrink:0;
+  }
+  .app-banner .app-banner-icon{
+    width:36px;height:36px;border-radius:10px;
+    background:rgba(255,255,255,0.14);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .app-banner .app-banner-icon svg{ width:20px; height:16px; }
+  .app-banner .app-banner-title{
+    font-family:'Cairo',sans-serif; font-weight:800; font-size:17px;
+    color:#fff; margin:0;
+  }
+
   /* ---------- Splash ---------- */
   #screen-splash .screen-body{
     background:
@@ -134,27 +155,37 @@
   }
   .home-hero .logo-row{ display:flex; justify-content:center; margin-bottom:8px;}
   .home-hero .logo-row svg{ width:64px; height:48px; }
-  .home-hero .made-by{
-    display:flex; align-items:center; justify-content:center; gap:10px;
-    margin:0 0 10px; padding:0 6px;
-  }
-  .home-hero .made-by::before, .home-hero .made-by::after{
-    content:''; flex:1; height:1px; max-width:38px;
-    background:linear-gradient(90deg, transparent, rgba(232,163,61,.75));
-  }
-  .home-hero .made-by::after{ background:linear-gradient(90deg, rgba(232,163,61,.75), transparent); }
-  .home-hero .made-by .mb-deco{
-    color:#f0c375; font-size:10px; line-height:1; flex-shrink:0;
-    text-shadow:0 0 6px rgba(232,163,61,.6);
-  }
-  .home-hero .made-by .mb-text{
-    font-family:'Cairo',sans-serif; font-weight:800; font-size:12px; letter-spacing:.3px;
-    white-space:nowrap;
-    color:#f5cd85;
-    text-shadow:0 0 10px rgba(232,163,61,.55), 0 1px 2px rgba(0,0,0,.35);
-  }
   .home-hero h2{ font-family:'Cairo',sans-serif; font-weight:800; font-size:21px; margin:6px 0 4px;}
   .home-hero p{ margin:0; font-size:13px; color:#dbe6f7; line-height:1.7; }
+
+  .credit-wrap{ text-align:center; padding:14px 16px 0; }
+  .credit-badge{
+    display:inline-block;
+    padding:8px 20px;
+    border-radius:999px;
+    background:linear-gradient(135deg, rgba(232,163,61,0.14), rgba(232,163,61,0.04));
+    border:1px solid rgba(232,163,61,0.45);
+    box-shadow:0 2px 10px rgba(232,163,61,0.12);
+  }
+  .credit-badge .credit-text{
+    font-family:'Cairo',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:0.6px;
+    background:linear-gradient(90deg,#c9862c,#f5cd85 50%,#c9862c);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  [data-theme="dark"] .credit-badge{
+    background:linear-gradient(135deg, rgba(232,163,61,0.22), rgba(232,163,61,0.08));
+    border-color:rgba(232,163,61,0.55);
+  }
+  [data-theme="dark"] .credit-badge .credit-text{
+    background:linear-gradient(90deg,#e8a33d,#ffe1ad 50%,#e8a33d);
+    -webkit-background-clip:text;
+    background-clip:text;
+  }
 
   .home-actions{ padding:4px 16px 8px; display:flex; flex-direction:column; gap:14px; }
   .big-btn{
@@ -172,6 +203,7 @@
   .btn-camera{ background:linear-gradient(135deg, var(--blue), #0e4fa3); }
   .btn-gallery{ background:linear-gradient(135deg, var(--green), var(--green-dark)); }
   .btn-saved{ background:linear-gradient(135deg, var(--amber), #c07f1f); }
+  .btn-preview{ background:linear-gradient(135deg, var(--teal), var(--teal-dark)); }
 
   .home-quick{
     display:flex; gap:10px; padding:6px 16px 20px; margin-top:auto;
@@ -407,6 +439,37 @@
     cursor:pointer; padding:2px; flex-shrink:0; font-family:'Cairo',sans-serif;
   }
 
+  /* ---------- Tile Preview Feature ---------- */
+  .pv-wrap{ padding:18px 16px 26px; display:flex; flex-direction:column; gap:14px; }
+  .pv-hero{ text-align:center; padding:6px 4px 2px; }
+  .pv-hero .ic{ width:54px;height:54px;border-radius:16px; background:linear-gradient(135deg,var(--teal),var(--teal-dark)); display:flex;align-items:center;justify-content:center; margin:0 auto 12px; }
+  .pv-hero h3{ font-family:'Cairo',sans-serif; font-weight:800; font-size:16px; margin:0 0 6px; }
+  .pv-hero p{ font-size:12.5px; color:var(--muted); line-height:1.8; margin:0; }
+  .pv-hint{ font-size:12.5px; color:var(--muted); line-height:1.7; margin:0; }
+  .pv-thumb-preview{ width:100%; aspect-ratio:4/3; border-radius:14px; background:#0b1220 center/cover no-repeat; box-shadow:var(--shadow); }
+  .pv-canvas-wrap{ position:relative; border-radius:14px; overflow:hidden; box-shadow:var(--shadow); touch-action:none; line-height:0; }
+  .pv-canvas-wrap canvas{ width:100%; display:block; background:#111; touch-action:none; }
+  .pv-badge{ display:inline-block; background:#eef3fb; color:var(--navy); border-radius:8px; padding:3px 10px; font-size:11px; font-weight:700; }
+  [data-theme="dark"] .pv-badge{ background:#152540; color:#8fc0ff; }
+  .pv-settings{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; }
+  .pv-row{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .pv-row:last-child{ margin-bottom:0; }
+  .pv-row label{ font-size:12px; color:var(--muted); flex:0 0 92px; }
+  .pv-row input[type=range]{ flex:1; accent-color: var(--teal); }
+  .pv-row .pv-val{ width:26px; text-align:center; font-size:12.5px; font-weight:700; color:var(--navy); }
+  [data-theme="dark"] .pv-row .pv-val{ color:#8fc0ff; }
+  .pv-lightbox{
+    position:fixed; inset:0; background:rgba(5,10,20,0.92); z-index:500;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    opacity:0; visibility:hidden; transition:opacity .2s ease;
+  }
+  .pv-lightbox.show{ opacity:1; visibility:visible; }
+  .pv-lightbox img{ max-width:100%; max-height:100%; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+  .pv-lightbox .close{
+    position:absolute; top:calc(var(--safe-top) + 6px); left:16px; width:36px;height:36px;border-radius:10px;
+    background:rgba(255,255,255,0.15); border:none; color:#fff; display:flex;align-items:center;justify-content:center; cursor:pointer; font-size:16px;
+  }
+
   input[type=file]{ display:none; }
   ::selection{ background:var(--blue); color:#fff; }
 
@@ -436,7 +499,14 @@
 
   <!-- ============ HOME ============ -->
   <section class="screen" id="screen-home">
+    <div class="app-banner">
+      <span class="app-banner-icon"><svg viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="20,130 75,45 105,90 130,55 180,130" fill="#ffffff"/><circle cx="150" cy="35" r="12" fill="#e8a33d"/></svg></span>
+      <h1 class="app-banner-title">عظيمو الجبل</h1>
+    </div>
     <div class="screen-body" style="display:flex;flex-direction:column;">
+      <div class="credit-wrap">
+        <span class="credit-badge"><span class="credit-text">تم إنشاء التطبيق بوساطة محمود حافظ المحمد المحمود</span></span>
+      </div>
       <div class="home-hero">
         <div class="logo-row">
           <svg viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -444,29 +514,15 @@
             <circle cx="150" cy="35" r="12" fill="#e8a33d"/>
           </svg>
         </div>
-        <p class="made-by"><span class="mb-deco">✦</span><span class="mb-text">تم إنشاء التطبيق بوساطة محمود حافظ المحمد المحمود 😎</span><span class="mb-deco">✦</span></p>
         <h2>عظيمو الجبل</h2>
         <p>احسب عدد البلاط والمساحة بسهولة</p>
       </div>
 
-      <div class="home-actions">
-        <button class="big-btn btn-camera" onclick="openCamera()">
-          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="14" r="3.4" stroke="#fff" stroke-width="1.7"/></svg></span>
-          <span class="txt">التقط صورة للبلاط<small>التقط صورة مباشرة</small></span>
-        </button>
-        <button class="big-btn btn-gallery" onclick="nav('screen-gallery')">
-          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#fff" stroke-width="1.7"/><circle cx="8.5" cy="9.5" r="1.6" stroke="#fff" stroke-width="1.5"/><path d="M21 16l-5.5-5.5a1.5 1.5 0 00-2.1 0L4 19" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg></span>
-          <span class="txt">اختر من المعرض<small>اختر صورة من هاتفك</small></span>
-        </button>
-        <button class="big-btn btn-saved" onclick="nav('screen-saved')">
-          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 3h12a1 1 0 011 1v16l-7-4-7 4V4a1 1 0 011-1z" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
-          <span class="txt">المحفوظات<small>النتائج المحفوظة سابقًا</small></span>
-        </button>
-      </div>
+      <div class="home-actions" id="homeActions"><!-- generated by renderHomeActions() --></div>
 
       <div class="home-quick">
         <div class="quick-card" onclick="nav('screen-settings')">
-          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 13.5a1.7 1.7 0 000-3l1.1-1.9-1.8-1.8-1.9 1.1a1.7 1.7 0 00-3 0L12.8 3H10l-1 4.9a1.7 1.7 0 00-3 0L4.1 6.8 2.3 8.6l1.1 1.9a1.7 1.7 0 000 3L2.3 15.4l1.8 1.8 1.9-1.1a1.7 1.7 0 003 0l1 4.9h2.8l1-4.9a1.7 1.7 0 003 0l1.9 1.1 1.8-1.8-1.1-1.9z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></div>
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
           <span>الإعدادات</span>
         </div>
         <div class="quick-card" onclick="showToast('صوّر بلاطة، أدخل أبعاد الغرفة، واحصل على العدد المطلوب فورًا')">
@@ -484,8 +540,8 @@
   <!-- ============ CAMERA ============ -->
   <section class="screen" id="screen-camera">
     <div class="topbar">
-      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <h1>التقاط صورة للبلاط</h1>
+      <div style="width:34px;height:34px;flex-shrink:0;" aria-hidden="true"></div>
+      <h1 id="cameraTitle">التقاط صورة للبلاط</h1>
     </div>
     <div class="screen-body">
       <div class="cam-view" id="camView">
@@ -496,7 +552,7 @@
         <div class="cam-hint" id="camHint">وجّه الكاميرا نحو البلاط ثم اضغط لالتقاط صورة</div>
       </div>
       <div class="cam-controls">
-        <button class="cam-side-btn" type="button" aria-label="اختيار صورة من المعرض" onclick="document.getElementById('galleryFileInput').click()"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#fff" stroke-width="1.7"/><circle cx="8.5" cy="9.5" r="1.6" stroke="#fff" stroke-width="1.5"/><path d="M21 16l-5.5-5.5a1.5 1.5 0 00-2.1 0L4 19" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+        <button class="cam-side-btn" id="camGalleryBtn" type="button" aria-label="اختيار صورة من المعرض" onclick="document.getElementById('galleryFileInput').click()"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#fff" stroke-width="1.7"/><circle cx="8.5" cy="9.5" r="1.6" stroke="#fff" stroke-width="1.5"/><path d="M21 16l-5.5-5.5a1.5 1.5 0 00-2.1 0L4 19" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg></button>
         <button class="shutter" type="button" aria-label="التقاط صورة" onclick="captureShot()"></button>
         <button class="cam-side-btn" type="button" id="flashBtn" aria-label="الفلاش" onclick="toggleFlash()"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/></svg></button>
       </div>
@@ -646,6 +702,9 @@
       <h1>النتيجة النهائية</h1>
     </div>
     <div class="screen-body">
+      <div class="pv-thumb-preview" id="resultPhotoBlock" style="display:none;margin-bottom:2px;"><img id="resultPhotoImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+      <button class="btn-outline" id="resultPhotoPreviewBtn" style="display:none;margin-bottom:8px;" onclick="previewCurrentResultPhoto()">معاينة بالكامل</button>
+      <button class="btn-outline" id="resultPhotoSaveBtn" style="display:none;margin-bottom:8px;" onclick="saveResultPhotoToGallery()">حفظ الصورة في المعرض</button>
       <div class="stat-card green">
         <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1.4" fill="#fff"/><rect x="13" y="3" width="8" height="8" rx="1.4" fill="#fff" opacity="0.75"/><rect x="3" y="13" width="8" height="8" rx="1.4" fill="#fff" opacity="0.75"/><rect x="13" y="13" width="8" height="8" rx="1.4" fill="#fff" opacity="0.55"/></svg></span>
         <div><div class="val" id="rTileCount">42 بلاطة</div><div class="lbl">عدد البلاط المطلوب</div></div>
@@ -662,7 +721,57 @@
       </div>
       <div class="bottom-pad" style="display:flex;flex-direction:column;gap:10px;">
         <button class="btn-outline" onclick="nav('screen-dims')">تعديل الأبعاد وإعادة الحساب</button>
+        <button class="btn-primary" id="pvFromResultBtn" style="background:linear-gradient(135deg,var(--teal),var(--teal-dark));" onclick="startRoomVisualizationFromResult()">عاين شكل البلاط بالغرفة</button>
         <button class="btn-primary" id="resultActionBtn" style="background:linear-gradient(135deg,var(--green),var(--green-dark));" onclick="saveResult()">حفظ النتيجة</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TILE PREVIEW: CROP TILE ============ -->
+  <section class="screen" id="screen-pv-crop">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>قص صورة البلاطة</h1>
+    </div>
+    <div class="screen-body">
+      <div class="pv-wrap">
+        <p class="pv-hint">حرّك الزوايا الصفراء لتحديد حدود البلاطة فقط، وتجاهل أي خلفية حواليها.</p>
+        <div class="pv-canvas-wrap"><canvas id="pvCropCanvas"></canvas></div>
+        <button class="btn-outline" onclick="resetCropHandles()">إعادة الضبط</button>
+        <button class="btn-primary" onclick="confirmCrop()">قص الصورة والمتابعة</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TILE PREVIEW: MARK FLOOR CORNERS ============ -->
+  <section class="screen" id="screen-pv-mark">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>تحديد الأرضية</h1>
+    </div>
+    <div class="screen-body">
+      <div class="pv-wrap">
+        <p class="pv-hint">حرّك النقاط الأربع لتطابق زوايا الأرضية بالضبط — بأي ترتيب وبأي وقت تحب.</p>
+        <div class="pv-canvas-wrap"><canvas id="pvMarkCanvas"></canvas></div>
+        <button class="btn-outline" onclick="resetMarkHandles()">إعادة الضبط</button>
+
+        <button class="btn-primary" style="background:linear-gradient(135deg,var(--teal),var(--teal-dark));" onclick="generatePreviewResult()">ركّب البلاط الآن</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TILE PREVIEW: RESULT ============ -->
+  <section class="screen" id="screen-pv-result">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>نتيجة المعاينة</h1>
+    </div>
+    <div class="screen-body">
+      <div class="pv-wrap">
+        <div class="pv-canvas-wrap"><canvas id="pvResultCanvas"></canvas></div>
+        <button class="btn-outline" onclick="openPvLightbox()">معاينة بحجم كامل</button>
+        <button class="btn-outline" onclick="nav('screen-pv-mark')">تعديل التحديد</button>
+        <button class="btn-primary" style="background:linear-gradient(135deg,var(--green),var(--green-dark));" onclick="useVisualizationAsResultPhoto()">استخدام هاي الصورة وإكمال الحفظ</button>
       </div>
     </div>
   </section>
@@ -701,7 +810,7 @@
         </div>
         <div class="set-row" onclick="toggleTheme()">
           <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8.5 8.5 0 019.5 4 8.5 8.5 0 1020 14.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span><span class="lbl">مظهر التطبيق</span>
-          <span class="val" id="themeVal">الوضع الفاتح</span><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="val" id="themeVal">الوضع الداكن</span><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </div>
         <div class="set-row" onclick="nav('screen-about')">
           <span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><line x1="12" y1="11" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="7.6" r="1.1" fill="currentColor"/></svg></span><span class="lbl">معلومات التطبيق</span>
@@ -739,11 +848,123 @@
   </section>
 
   <div class="toast" id="toast"></div>
+
+  <div class="pv-lightbox" id="pvLightbox" onclick="closePvLightbox()">
+    <button class="close" onclick="event.stopPropagation(); closePvLightbox();" aria-label="إغلاق">✕</button>
+    <img id="pvLightboxImg" src="" alt="معاينة النتيجة">
+  </div>
 </div>
 
 <input type="file" id="galleryFileInput" accept="image/*">
+<input type="file" id="previewFileInput" accept="image/*">
 
 <script>
+/* ============== PERSISTENT STORAGE (IndexedDB) ==============
+   تخزين دائم للنتائج المحفوظة — يبقى بعد إغلاق التطبيق أو إعادة
+   فتحه (خلافاً لمصفوفة savedResults وحدها التي كانت تُفرَّغ من
+   الذاكرة عند كل إغلاق). لا يُمسح إلا بحذف بيانات/تثبيت التطبيق.
+   لا تبعيات خارجية — IndexedDB مدعومة أصلاً داخل WebView. */
+const DB_NAME = 'AzimuAlJabalDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'savedResults';
+let _dbInstance = null;
+
+function openDB(){
+  return new Promise((resolve, reject) => {
+    if(_dbInstance){ resolve(_dbInstance); return; }
+    if(!window.indexedDB){ reject(new Error('IndexedDB غير مدعومة')); return; }
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains(STORE_NAME)){
+        db.createObjectStore(STORE_NAME, {keyPath:'id', autoIncrement:true});
+      }
+    };
+    req.onsuccess = (e) => { _dbInstance = e.target.result; resolve(_dbInstance); };
+    req.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function dbGetAll(){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }catch(err){
+    console.warn('IndexedDB dbGetAll فشلت:', err);
+    return [];
+  }
+}
+
+async function dbAdd(item){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.add(item);
+      req.onsuccess = () => resolve(req.result); // يُعيد id الجديد
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }catch(err){
+    console.warn('IndexedDB dbAdd فشلت:', err);
+    return null;
+  }
+}
+
+async function dbPut(item){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.put(item);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }catch(err){
+    console.warn('IndexedDB dbPut فشلت:', err);
+    return null;
+  }
+}
+
+async function dbDelete(id){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.delete(id);
+      req.onsuccess = () => resolve(true);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }catch(err){
+    console.warn('IndexedDB dbDelete فشلت:', err);
+    return false;
+  }
+}
+
+async function dbClear(){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.clear();
+      req.onsuccess = () => resolve(true);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }catch(err){
+    console.warn('IndexedDB dbClear فشلت:', err);
+    return false;
+  }
+}
+
 /* ============== APP STATE ============== */
 let history_stack = ['screen-home'];
 let currentImageCSS = 'sw-marble-beige';
@@ -752,15 +973,9 @@ let currentTileSizeCm = 60;
 let currentTileShape = 'square';
 let rectPreset = {w:30, h:60};
 let lastCalc = null;
-let savedResults = [
-  {name:'مطبخ', date:'2025-09-10 14:32', swatch:'sw-marble-beige', area:15.2, count:42, tileSize:60},
-  {name:'حمام', date:'2025-09-09 11:20', swatch:'sw-hex', area:6.5, count:18, tileSize:30},
-  {name:'صالة', date:'2025-09-08 16:45', swatch:'sw-marble-gray', area:28.0, count:75, tileSize:60}
-];
-savedResults.forEach(r=>{
-  r.tileArea = +(((r.tileSize/100)**2).toFixed(4));
-  r.roomArea = +((r.area/1.08).toFixed(2));
-});
+/* تبدأ فارغة دائماً — تُملأ من IndexedDB عند الإقلاع (انظر loadSavedResultsFromDB
+   في نهاية الملف). لا بيانات تجريبية افتراضية: نتائج حقيقية فقط. */
+let savedResults = [];
 let viewingSavedIndex = null;
 const soundEnabled = () => document.getElementById('soundToggle').checked;
 
@@ -782,7 +997,7 @@ function nav(id, replace){
   else{ history_stack.push(id); }
   if(id === 'screen-saved') renderSavedList();
   if(id === 'screen-gallery') renderGalleryGrid();
-  if(id === 'screen-result') updateResultActionButton();
+  if(id === 'screen-result'){ updateResultActionButton(); updatePreviewButtonVisibility(); refreshResultPhotoDisplay(); }
   refreshAccessibility();
 }
 function goBack(){
@@ -841,17 +1056,33 @@ document.getElementById('screen-splash').addEventListener('click', ()=>{
 
 /* ---------- Camera ---------- */
 let camStream = null;
-function openCamera(){
+function openCamera(mode){
+  window._camMode = mode || 'count';
   nav('screen-camera');
-  document.getElementById('camHint').textContent = 'وجّه الكاميرا نحو البلاط ثم اضغط لالتقاط صورة';
+  const hintEl = document.getElementById('camHint');
+  const titleEl = document.getElementById('cameraTitle');
+  const galBtn = document.getElementById('camGalleryBtn');
+  if(window._camMode === 'preview-room'){
+    titleEl.textContent = 'تصوير الغرفة';
+    hintEl.textContent = 'وجّه الكاميرا نحو أرضية الغرفة ثم اضغط للالتقاط';
+    galBtn.onclick = ()=> triggerPreviewFilePick('room');
+  } else if(window._camMode === 'preview-tile'){
+    titleEl.textContent = 'تصوير البلاطة';
+    hintEl.textContent = 'وجّه الكاميرا نحو البلاطة ثم اضغط للالتقاط';
+    galBtn.onclick = ()=> triggerPreviewFilePick('tile');
+  } else {
+    titleEl.textContent = 'التقاط صورة للبلاط';
+    hintEl.textContent = 'وجّه الكاميرا نحو البلاط ثم اضغط لالتقاط صورة';
+    galBtn.onclick = ()=> triggerPreviewFilePick('tile');
+  }
   const video = document.getElementById('camVideo');
   video.style.display='block';
   if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
     navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})
       .then(stream=>{ camStream = stream; video.srcObject = stream; })
-      .catch(()=>{ document.getElementById('camHint').textContent = 'تعذّر الوصول إلى الكاميرا — اضغط لاختيار صورة بدلاً من ذلك'; });
+      .catch(()=>{ hintEl.textContent = 'تعذّر الوصول إلى الكاميرا — اضغط لاختيار صورة بدلاً من ذلك'; });
   } else {
-    document.getElementById('camHint').textContent = 'الكاميرا غير مدعومة في هذا المتصفح — اضغط لاختيار صورة';
+    hintEl.textContent = 'الكاميرا غير مدعومة في هذا المتصفح — اضغط لاختيار صورة';
   }
 }
 function stopCameraStream(){
@@ -885,11 +1116,24 @@ function captureShot(){
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth; canvas.height = video.videoHeight;
     canvas.getContext('2d').drawImage(video,0,0);
-    const dataUrl = canvas.toDataURL('image/jpeg',0.85);
-    startAnalysis({type:'photo', data:dataUrl});
+    const dataUrl = canvas.toDataURL('image/jpeg',0.9);
     stopCameraStream();
+    handleCapturedPhoto(dataUrl);
   } else {
-    document.getElementById('galleryFileInput').click();
+    if(window._camMode === 'preview-room') triggerPreviewFilePick('room');
+    else triggerPreviewFilePick('tile');
+  }
+}
+
+function handleCapturedPhoto(dataUrl){
+  if(window._camMode === 'preview-room'){
+    tilePreview.roomImageData = dataUrl;
+    nav('screen-pv-mark');
+    initMarkScreen();
+  } else {
+    tilePreview.tileRawData = dataUrl;
+    nav('screen-pv-crop');
+    initCropScreen();
   }
 }
 
@@ -1022,12 +1266,14 @@ document.getElementById('rectPresetRow').addEventListener('click', e=>{
 /* ---------- Calculation ---------- */
 function runCalculation(){
   viewingSavedIndex = null;
+  window._lastVisualizationImage = null;
   const L = parseFloat(document.getElementById('roomLength').value) || 0;
   const W = parseFloat(document.getElementById('roomWidth').value) || 0;
   const name = document.getElementById('roomName').value.trim() || 'غرفة';
   if(L<=0 || W<=0){ showToast('الرجاء إدخال أبعاد صحيحة للمكان'); return; }
 
   let tileArea = 0, tileTypeLabel = 'مربّع', tileDimsLabel = '';
+  let tileWidthCm = null, tileHeightCm = null;
   if(currentTileShape === 'square'){
     const customChip = document.querySelector('#tileSizeRow .tile-chip[data-size="custom"].active');
     let sizeCm = currentTileSizeCm;
@@ -1039,6 +1285,7 @@ function runCalculation(){
     tileArea = +(side*side).toFixed(4);
     tileTypeLabel = 'مربّع';
     tileDimsLabel = `${sizeCm} × ${sizeCm} سم`;
+    tileWidthCm = sizeCm; tileHeightCm = sizeCm;
   } else if(currentTileShape === 'rect'){
     const customChip = document.querySelector('#rectPresetRow .tile-chip[data-w="custom"].active');
     let wCm = rectPreset.w, hCm = rectPreset.h;
@@ -1050,6 +1297,7 @@ function runCalculation(){
     tileArea = +((wCm/100)*(hCm/100)).toFixed(4);
     tileTypeLabel = 'مستطيل';
     tileDimsLabel = `${wCm} × ${hCm} سم`;
+    tileWidthCm = wCm; tileHeightCm = hCm;
   } else if(currentTileShape === 'triangle'){
     const baseCm = parseFloat(document.getElementById('triBase').value) || 0;
     const heightCm = parseFloat(document.getElementById('triHeight').value) || 0;
@@ -1071,7 +1319,7 @@ function runCalculation(){
   const tileCount = Math.ceil((roomArea*waste)/tileArea);
   const totalArea = +(tileCount*tileArea).toFixed(2);
 
-  lastCalc = {name, roomArea, tileArea, tileCount, totalArea, tileShape:currentTileShape, tileTypeLabel, tileDimsLabel, source: window._lastImageSource};
+  lastCalc = {name, roomArea, tileArea, tileCount, totalArea, tileShape:currentTileShape, tileTypeLabel, tileDimsLabel, source: window._lastImageSource, roomLengthM:L, roomWidthM:W, tileWidthCm, tileHeightCm};
 
   // detail screen
   const detailImg = document.getElementById('detailImg');
@@ -1102,22 +1350,33 @@ function saveResult(){
   const now = new Date();
   const pad = n => String(n).padStart(2,'0');
   const dateStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-  savedResults.unshift({
+  const visualPhoto = window._lastVisualizationImage || null;
+  const newItem = {
     name: lastCalc.name,
     date: dateStr,
     swatch: (lastCalc.source && lastCalc.source.type==='swatch') ? lastCalc.source.data : null,
-    photo: (lastCalc.source && lastCalc.source.type==='photo') ? lastCalc.source.data : null,
+    photo: visualPhoto || ((lastCalc.source && lastCalc.source.type==='photo') ? lastCalc.source.data : null),
+    isVisual: !!visualPhoto,
     area: lastCalc.totalArea,
     count: lastCalc.tileCount,
     tileShape: lastCalc.tileShape,
     tileTypeLabel: lastCalc.tileTypeLabel,
     tileDimsLabel: lastCalc.tileDimsLabel,
     roomArea: lastCalc.roomArea,
-    tileArea: lastCalc.tileArea
-  });
+    tileArea: lastCalc.tileArea,
+    roomLengthM: lastCalc.roomLengthM,
+    roomWidthM: lastCalc.roomWidthM,
+    tileWidthCm: lastCalc.tileWidthCm,
+    tileHeightCm: lastCalc.tileHeightCm
+  };
+  savedResults.unshift(newItem);
+  window._lastVisualizationImage = null;
   showToast('تم حفظ النتيجة بنجاح');
   beep();
   setTimeout(()=> nav('screen-saved', true), 450);
+  // حفظ دائم في IndexedDB — id يُعاد من المتصفح ويُخزَّن بالعنصر
+  // نفسه بالذاكرة، ليكون متاحاً لاحقاً لعمليات الحذف/التحديث.
+  dbAdd(newItem).then(id => { if(id!=null) newItem.id = id; });
 }
 
 function renderSavedList(){
@@ -1135,7 +1394,7 @@ function renderSavedList(){
           <div class="date">${r.date}</div>
         </div>
       </div>
-      <div class="meta"><b>${r.count} بلاطة</b>${r.area} م²</div>
+      <div class="meta">${r.isVisual ? `<span class="pv-badge">معاينة</span>` : ``}<b>${r.count} بلاطة</b>${r.area} م²</div>
       <button class="del" type="button" aria-label="حذف ${escapeHtml(r.name)}" onclick="deleteSavedItem(${i})">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m3 0-1 13a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7h14z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -1151,9 +1410,13 @@ function escapeHtml(str){
 function deleteSavedItem(index){
   const removed = savedResults.splice(index,1)[0];
   renderSavedList();
+  if(removed && removed.id!=null) dbDelete(removed.id);
   showToast('تم حذف النتيجة', 'تراجع', ()=>{
     savedResults.splice(index,0,removed);
     renderSavedList();
+    // إعادة الإضافة بنفس id (put) بدل id جديد (add) — يحافظ على
+    // الهوية الأصلية للسجل في حال أُلغي الحذف بالتراجع.
+    if(removed && removed.id!=null) dbPut(removed); else if(removed) dbAdd(removed).then(id=>{ if(id!=null) removed.id=id; });
   });
 }
 
@@ -1162,9 +1425,12 @@ function clearAllSaved(){
   const backup = savedResults.slice();
   savedResults = [];
   renderSavedList();
+  dbClear();
   showToast('تم حذف جميع النتائج', 'تراجع', ()=>{
     savedResults = backup;
     renderSavedList();
+    // إعادة كل السجلات لـ IndexedDB بنفس معرّفاتها الأصلية (put)
+    backup.forEach(item => { if(item.id!=null) dbPut(item); });
   });
 }
 
@@ -1194,14 +1460,60 @@ function updateResultActionButton(){
   }
 }
 
+/* ---------- Room visualization entry point (reuses the tile photo + math already computed) ---------- */
+function getActiveTileImageAndCalc(){
+  if(viewingSavedIndex !== null){
+    const item = savedResults[viewingSavedIndex];
+    return {
+      tileImg: (item && item.photo && !item.isVisual) ? item.photo : null,
+      calc: item || null
+    };
+  }
+  return {
+    tileImg: window._lastCroppedTileImage || ((window._lastImageSource && window._lastImageSource.type==='photo') ? window._lastImageSource.data : null),
+    calc: lastCalc
+  };
+}
+function computeAutoRepeats(calc){
+  if(calc && (calc.tileShape==='square' || calc.tileShape==='rect') &&
+     calc.roomLengthM>0 && calc.roomWidthM>0 && calc.tileWidthCm>0 && calc.tileHeightCm>0){
+    const rx = Math.max(1, Math.round((calc.roomLengthM*100)/calc.tileWidthCm));
+    const ry = Math.max(1, Math.round((calc.roomWidthM*100)/calc.tileHeightCm));
+    return {rx, ry};
+  }
+  return {rx:6, ry:6}; // fallback when exact dims aren't available (e.g. triangle/other tile shapes)
+}
+function updatePreviewButtonVisibility(){
+  const btn = document.getElementById('pvFromResultBtn');
+  if(!btn) return;
+  const {tileImg} = getActiveTileImageAndCalc();
+  btn.style.display = tileImg ? '' : 'none';
+}
+function startRoomVisualizationFromResult(){
+  const {tileImg, calc} = getActiveTileImageAndCalc();
+  if(!tileImg){ showToast('هاي الميزة تحتاج صورة حقيقية للبلاط'); return; }
+  const {rx, ry} = computeAutoRepeats(calc);
+  tilePreview = {
+    roomImageData:null,
+    tileRawData:null,
+    tileImageData: tileImg,
+    points:null,
+    repeatX: rx, repeatY: ry, shade:0,
+    resultDataUrl:null
+  };
+  openCamera('preview-room');
+}
+
 function deleteCurrentSavedFromResult(){
   const idx = viewingSavedIndex;
   if(idx===null) return;
   const removed = savedResults.splice(idx,1)[0];
   viewingSavedIndex = null;
+  if(removed && removed.id!=null) dbDelete(removed.id);
   showToast('تم حذف النتيجة من المحفوظات', 'تراجع', ()=>{
     savedResults.splice(idx,0,removed);
     renderSavedList();
+    if(removed && removed.id!=null) dbPut(removed); else if(removed) dbAdd(removed).then(id=>{ if(id!=null) removed.id=id; });
   });
   nav('screen-saved', true);
 }
@@ -1216,8 +1528,443 @@ function toggleTheme(){
   document.getElementById('themeColorMeta').setAttribute('content', isDark ? '#0a2a4d' : '#0b1524');
 }
 
+/* ================= HOME ACTIONS (flexible config-driven buttons) ================= */
+/* To add a new home-screen button later, just push a new object here — no HTML editing needed. */
+const homeActionsConfig = [
+  {
+    id:'start', className:'btn-camera', label:'احسب البلاط وعاين شكله', sub:'صوّر البلاط، احسب الكمية، وشوف شكله بغرفتك',
+    icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="14" r="3.4" stroke="#fff" stroke-width="1.7"/></svg>',
+    onClick: ()=>openCamera('count')
+  },
+  {
+    id:'saved', className:'btn-saved', label:'المحفوظات', sub:'النتائج المحفوظة سابقًا',
+    icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 3h12a1 1 0 011 1v16l-7-4-7 4V4a1 1 0 011-1z" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/></svg>',
+    onClick: ()=>nav('screen-saved')
+  }
+];
+function renderHomeActions(){
+  const wrap = document.getElementById('homeActions');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  homeActionsConfig.forEach(a=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'big-btn ' + a.className;
+    btn.innerHTML = `<span class="ic">${a.icon}</span><span class="txt">${a.label}<small>${a.sub}</small></span>`;
+    btn.addEventListener('click', a.onClick);
+    wrap.appendChild(btn);
+  });
+}
+renderHomeActions();
+
+/* ================= TILE PREVIEW FEATURE (perspective warp, no AI) ================= */
+let tilePreview = {
+  roomImageData: null,   // dataURL of the room photo
+  tileRawData: null,     // dataURL of the raw (uncropped) tile photo
+  tileImageData: null,   // dataURL of the cropped tile photo
+  points: null,          // 4 {x,y} floor corners in room natural-pixel space
+  repeatX: 6, repeatY: 6, shade: 0,
+  resultDataUrl: null
+};
+let _previewFileTarget = null;
+
+function triggerPreviewFilePick(target){
+  _previewFileTarget = target; // 'room' or 'tile'
+  document.getElementById('previewFileInput').click();
+}
+document.getElementById('previewFileInput').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    if(_previewFileTarget === 'room'){
+      tilePreview.roomImageData = ev.target.result;
+      nav('screen-pv-mark');
+      initMarkScreen();
+    } else if(_previewFileTarget === 'tile'){
+      tilePreview.tileRawData = ev.target.result;
+      nav('screen-pv-crop');
+      initCropScreen();
+    }
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+/* ---------- Homography helpers: unit square -> quad, and its inverse ---------- */
+function pvComputeSquareToQuad(p0,p1,p2,p3){
+  const dx1=p1.x-p2.x, dx2=p3.x-p2.x, dx3=p0.x-p1.x+p2.x-p3.x;
+  const dy1=p1.y-p2.y, dy2=p3.y-p2.y, dy3=p0.y-p1.y+p2.y-p3.y;
+  let a13=0, a23=0;
+  if(Math.abs(dx3)>1e-10 || Math.abs(dy3)>1e-10){
+    const det = dx1*dy2 - dx2*dy1;
+    a13 = (dx3*dy2 - dx2*dy3) / det;
+    a23 = (dx1*dy3 - dx3*dy1) / det;
+  }
+  const a11=p1.x-p0.x+a13*p1.x, a21=p3.x-p0.x+a23*p3.x, a31=p0.x;
+  const a12=p1.y-p0.y+a13*p1.y, a22=p3.y-p0.y+a23*p3.y, a32=p0.y;
+  return [a11,a21,a31, a12,a22,a32, a13,a23,1];
+}
+function pvInvert3x3(m){
+  const [a,b,c,d,e,f,g,h,i]=m;
+  const A=e*i-f*h, B=-(d*i-f*g), C=d*h-e*g;
+  const D=-(b*i-c*h), E=a*i-c*g, F=-(a*h-b*g);
+  const G=b*f-c*e, H=-(a*f-c*d), I=a*e-b*d;
+  const det=a*A+b*B+c*C;
+  return [A/det,D/det,G/det, B/det,E/det,H/det, C/det,F/det,I/det];
+}
+function pvApplyMatrix(m,x,y){
+  const [a,b,c,d,e,f,g,h,i]=m;
+  const X=a*x+b*y+c, Y=d*x+e*y+f, W=g*x+h*y+i;
+  return {x:X/W, y:Y/W};
+}
+
+/* ---------- Crop screen (remove edges/background from the tile photo) ---------- */
+let cropImg = null;
+let cropRect = null;
+let cropDragHandle = null;
+let cropDragOffset = null;
+
+function initCropScreen(){
+  const canvas = document.getElementById('pvCropCanvas');
+  const img = new Image();
+  img.onload = ()=>{
+    cropImg = img;
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    resetCropHandles();
+  };
+  img.src = tilePreview.tileRawData;
+}
+function resetCropHandles(){
+  if(!cropImg) return;
+  const w = cropImg.naturalWidth, h = cropImg.naturalHeight;
+  cropRect = { left: w*0.1, top: h*0.1, right: w*0.9, bottom: h*0.9 };
+  drawCropCanvas();
+}
+function drawCropCanvas(){
+  const canvas = document.getElementById('pvCropCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(cropImg, 0, 0);
+  const {left,top,right,bottom} = cropRect;
+  ctx.fillStyle = 'rgba(5,10,20,0.55)';
+  ctx.fillRect(0,0,canvas.width, top);
+  ctx.fillRect(0,bottom,canvas.width, canvas.height-bottom);
+  ctx.fillRect(0,top,left, bottom-top);
+  ctx.fillRect(right,top,canvas.width-right, bottom-top);
+  ctx.strokeStyle = '#e8a33d';
+  ctx.lineWidth = Math.max(2, canvas.width*0.004);
+  ctx.strokeRect(left, top, right-left, bottom-top);
+  const hs = Math.max(10, canvas.width*0.02);
+  ctx.fillStyle = '#e8a33d';
+  [[left,top],[right,top],[left,bottom],[right,bottom]].forEach(([x,y])=>{
+    ctx.beginPath(); ctx.arc(x,y,hs,0,Math.PI*2); ctx.fill();
+  });
+}
+function getCropCanvasPoint(evt){
+  const canvas = document.getElementById('pvCropCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
+  return { x:(evt.clientX-rect.left)*scaleX, y:(evt.clientY-rect.top)*scaleY };
+}
+(function setupCropPointerEvents(){
+  const canvas = document.getElementById('pvCropCanvas');
+  canvas.addEventListener('pointerdown', e=>{
+    if(!cropRect) return;
+    canvas.setPointerCapture(e.pointerId);
+    const p = getCropCanvasPoint(e);
+    const hs = Math.max(18, canvas.width*0.04);
+    const {left,top,right,bottom} = cropRect;
+    const dist=(x,y)=>Math.hypot(p.x-x,p.y-y);
+    if(dist(left,top)<hs) cropDragHandle='tl';
+    else if(dist(right,top)<hs) cropDragHandle='tr';
+    else if(dist(left,bottom)<hs) cropDragHandle='bl';
+    else if(dist(right,bottom)<hs) cropDragHandle='br';
+    else if(p.x>left && p.x<right && p.y>top && p.y<bottom){
+      cropDragHandle='move';
+      cropDragOffset = {x:p.x-left, y:p.y-top, w:right-left, h:bottom-top};
+    } else cropDragHandle=null;
+  });
+  canvas.addEventListener('pointermove', e=>{
+    if(!cropDragHandle || !cropRect) return;
+    const p = getCropCanvasPoint(e);
+    const w = canvas.width, h = canvas.height;
+    const cx = Math.max(0, Math.min(w, p.x)), cy = Math.max(0, Math.min(h, p.y));
+    if(cropDragHandle==='tl'){ cropRect.left=Math.min(cx,cropRect.right-20); cropRect.top=Math.min(cy,cropRect.bottom-20); }
+    else if(cropDragHandle==='tr'){ cropRect.right=Math.max(cx,cropRect.left+20); cropRect.top=Math.min(cy,cropRect.bottom-20); }
+    else if(cropDragHandle==='bl'){ cropRect.left=Math.min(cx,cropRect.right-20); cropRect.bottom=Math.max(cy,cropRect.top+20); }
+    else if(cropDragHandle==='br'){ cropRect.right=Math.max(cx,cropRect.left+20); cropRect.bottom=Math.max(cy,cropRect.top+20); }
+    else if(cropDragHandle==='move'){
+      let nx = cx-cropDragOffset.x, ny = cy-cropDragOffset.y;
+      nx = Math.max(0, Math.min(w-cropDragOffset.w, nx));
+      ny = Math.max(0, Math.min(h-cropDragOffset.h, ny));
+      cropRect.left=nx; cropRect.top=ny; cropRect.right=nx+cropDragOffset.w; cropRect.bottom=ny+cropDragOffset.h;
+    }
+    drawCropCanvas();
+  });
+  ['pointerup','pointercancel'].forEach(ev=>canvas.addEventListener(ev, ()=>{ cropDragHandle=null; }));
+})();
+function confirmCrop(){
+  if(!cropImg || !cropRect) return;
+  const {left,top,right,bottom} = cropRect;
+  const w = Math.round(right-left), h = Math.round(bottom-top);
+  if(w<10 || h<10){ showToast('حدد مساحة أكبر للقص'); return; }
+  const out = document.createElement('canvas');
+  out.width = w; out.height = h;
+  out.getContext('2d').drawImage(cropImg, left, top, w, h, 0, 0, w, h);
+  const croppedDataUrl = out.toDataURL('image/jpeg', 0.92);
+  window._lastCroppedTileImage = croppedDataUrl;
+  startAnalysis({type:'photo', data:croppedDataUrl});
+}
+
+/* ---------- Mark floor corners (draggable quad, any order, any time) ---------- */
+let markImg = null;
+let markPoints = null;
+let markDragIndex = null;
+
+function initMarkScreen(){
+  const canvas = document.getElementById('pvMarkCanvas');
+  const img = new Image();
+  img.onload = ()=>{
+    markImg = img;
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    if(tilePreview.points && tilePreview.points.length===4){
+      markPoints = tilePreview.points.map(p=>({x:p.x,y:p.y}));
+    } else {
+      resetMarkHandles();
+    }
+    drawMarkCanvas();
+  };
+  img.src = tilePreview.roomImageData;
+}
+function resetMarkHandles(){
+  if(!markImg) return;
+  const w = markImg.naturalWidth, h = markImg.naturalHeight;
+  markPoints = [
+    {x:w*0.22, y:h*0.55},
+    {x:w*0.78, y:h*0.55},
+    {x:w*0.95, y:h*0.92},
+    {x:w*0.05, y:h*0.92}
+  ];
+  drawMarkCanvas();
+}
+function drawMarkCanvas(){
+  const canvas = document.getElementById('pvMarkCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(markImg, 0, 0);
+  if(!markPoints) return;
+  ctx.strokeStyle = 'rgba(232,163,61,0.9)';
+  ctx.lineWidth = Math.max(2, canvas.width*0.003);
+  ctx.beginPath();
+  markPoints.forEach((p,i)=> i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
+  ctx.closePath(); ctx.stroke();
+  ctx.fillStyle = 'rgba(232,163,61,0.15)';
+  ctx.fill();
+  const hs = Math.max(11, canvas.width*0.02);
+  markPoints.forEach((p,i)=>{
+    ctx.beginPath(); ctx.fillStyle = '#e8a33d';
+    ctx.arc(p.x,p.y,hs,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${Math.round(hs*1.1)}px sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText((i+1), p.x, p.y);
+  });
+}
+function getMarkCanvasPoint(evt){
+  const canvas = document.getElementById('pvMarkCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
+  return { x:(evt.clientX-rect.left)*scaleX, y:(evt.clientY-rect.top)*scaleY };
+}
+(function setupMarkPointerEvents(){
+  const canvas = document.getElementById('pvMarkCanvas');
+  canvas.addEventListener('pointerdown', e=>{
+    if(!markPoints) return;
+    canvas.setPointerCapture(e.pointerId);
+    const p = getMarkCanvasPoint(e);
+    const hs = Math.max(22, canvas.width*0.04);
+    let closest=-1, closestDist=Infinity;
+    markPoints.forEach((mp,i)=>{
+      const d = Math.hypot(p.x-mp.x, p.y-mp.y);
+      if(d<hs && d<closestDist){ closest=i; closestDist=d; }
+    });
+    markDragIndex = closest;
+  });
+  canvas.addEventListener('pointermove', e=>{
+    if(markDragIndex===null || markDragIndex<0) return;
+    const p = getMarkCanvasPoint(e);
+    markPoints[markDragIndex].x = Math.max(0, Math.min(canvas.width, p.x));
+    markPoints[markDragIndex].y = Math.max(0, Math.min(canvas.height, p.y));
+    drawMarkCanvas();
+  });
+  ['pointerup','pointercancel'].forEach(ev=>canvas.addEventListener(ev, ()=>{ markDragIndex=null; }));
+})();
+
+/* ---------- Generate the composite result ---------- */
+function generatePreviewResult(){
+  if(!markPoints || markPoints.length!==4){ showToast('حدد زوايا الأرضية أولاً'); return; }
+  tilePreview.points = markPoints.map(p=>({x:p.x,y:p.y}));
+  showToast('جاري تركيب البلاط...');
+  renderPvResult().then(()=>{
+    nav('screen-pv-result');
+    beep();
+  }).catch(()=>{
+    showToast('حدث خطأ أثناء التركيب، حاول تعديل التحديد');
+  });
+}
+function renderPvResult(){
+  return new Promise((resolve, reject)=>{
+    try{
+      const W = markImg.naturalWidth, H = markImg.naturalHeight;
+      const canvas = document.getElementById('pvResultCanvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(markImg, 0, 0);
+      const baseData = ctx.getImageData(0,0,W,H);
+
+      const tileImgEl = new Image();
+      tileImgEl.onload = ()=>{
+        try{
+          const tCanvas = document.createElement('canvas');
+          tCanvas.width = tileImgEl.naturalWidth; tCanvas.height = tileImgEl.naturalHeight;
+          const tctx = tCanvas.getContext('2d');
+          tctx.drawImage(tileImgEl, 0, 0);
+          const tileData = tctx.getImageData(0,0,tCanvas.width, tCanvas.height);
+
+          const pts = tilePreview.points;
+          const fwd = pvComputeSquareToQuad(pts[0], pts[1], pts[2], pts[3]);
+          const inv = pvInvert3x3(fwd);
+          const rx = tilePreview.repeatX, ry = tilePreview.repeatY, shade = tilePreview.shade/100;
+
+          const xs = pts.map(p=>p.x), ys = pts.map(p=>p.y);
+          const minX = Math.max(0, Math.floor(Math.min(...xs)));
+          const maxX = Math.min(W-1, Math.ceil(Math.max(...xs)));
+          const minY = Math.max(0, Math.floor(Math.min(...ys)));
+          const maxY = Math.min(H-1, Math.ceil(Math.max(...ys)));
+
+          const outData = ctx.getImageData(0,0,W,H);
+          function pointInQuad(x,y){
+            let inside=false;
+            for(let i=0,j=3;i<4;j=i++){
+              const xi=pts[i].x, yi=pts[i].y, xj=pts[j].x, yj=pts[j].y;
+              const intersect = ((yi>y)!==(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi);
+              if(intersect) inside=!inside;
+            }
+            return inside;
+          }
+          for(let y=minY;y<=maxY;y++){
+            for(let x=minX;x<=maxX;x++){
+              if(!pointInQuad(x,y)) continue;
+              const uv = pvApplyMatrix(inv, x, y);
+              let u=uv.x, v=uv.y;
+              if(u<0||u>1||v<0||v>1) continue;
+              let tu=(u*rx)%1; if(tu<0) tu+=1;
+              let tv=(v*ry)%1; if(tv<0) tv+=1;
+              const tx = Math.min(tCanvas.width-1, Math.floor(tu*tCanvas.width));
+              const ty = Math.min(tCanvas.height-1, Math.floor(tv*tCanvas.height));
+              const tIdx = (ty*tCanvas.width+tx)*4;
+              const oIdx = (y*W+x)*4;
+              const br=baseData.data[oIdx], bg=baseData.data[oIdx+1], bb=baseData.data[oIdx+2];
+              const lum = (0.299*br+0.587*bg+0.114*bb)/255;
+              const factor = 1 - shade + shade*(lum*1.6);
+              outData.data[oIdx]   = Math.min(255, tileData.data[tIdx]*factor);
+              outData.data[oIdx+1] = Math.min(255, tileData.data[tIdx+1]*factor);
+              outData.data[oIdx+2] = Math.min(255, tileData.data[tIdx+2]*factor);
+              outData.data[oIdx+3] = 255;
+            }
+          }
+          ctx.putImageData(outData, 0, 0);
+          tilePreview.resultDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+          resolve();
+        }catch(err){ reject(err); }
+      };
+      tileImgEl.onerror = reject;
+      tileImgEl.src = tilePreview.tileImageData;
+    }catch(err){ reject(err); }
+  });
+}
+
+/* ---------- Fullscreen preview + save to المحفوظات ---------- */
+function openPvLightbox(){
+  if(!tilePreview.resultDataUrl) return;
+  document.getElementById('pvLightboxImg').src = tilePreview.resultDataUrl;
+  document.getElementById('pvLightbox').classList.add('show');
+}
+function closePvLightbox(){
+  document.getElementById('pvLightbox').classList.remove('show');
+}
+function setResultPhotoDisplay(photoUrl){
+  window._currentResultPhoto = photoUrl || null;
+  const block = document.getElementById('resultPhotoBlock');
+  const btn = document.getElementById('resultPhotoPreviewBtn');
+  const saveBtn = document.getElementById('resultPhotoSaveBtn');
+  const img = document.getElementById('resultPhotoImg');
+  if(photoUrl){
+    img.src = photoUrl;
+    block.style.display = '';
+    btn.style.display = '';
+    saveBtn.style.display = '';
+  } else {
+    block.style.display = 'none';
+    btn.style.display = 'none';
+    saveBtn.style.display = 'none';
+  }
+}
+function saveResultPhotoToGallery(){
+  if(!window._currentResultPhoto){ showToast('لا توجد صورة لحفظها'); return; }
+  if(!(window.AndroidBridge && typeof window.AndroidBridge.saveImageToGallery === 'function')){
+    showToast('حفظ الصور بالمعرض متاح فقط داخل تطبيق الجوال'); return;
+  }
+  const filename = 'azimu_' + Date.now() + '.png';
+  try{
+    // الدالة الأصلية لا تُرجع قيمة — تعرض توست النجاح/الفشل من جهة
+    // Java مباشرة (عبر runJs + window.showToast) بعد إتمام الكتابة فعلياً
+    window.AndroidBridge.saveImageToGallery(window._currentResultPhoto, filename);
+  }catch(e){
+    showToast('تعذّر حفظ الصورة');
+  }
+}
+function refreshResultPhotoDisplay(){
+  let photo = null;
+  if(viewingSavedIndex !== null){
+    const item = savedResults[viewingSavedIndex];
+    photo = item ? item.photo : null;
+  } else {
+    photo = window._lastVisualizationImage || ((window._lastImageSource && window._lastImageSource.type==='photo') ? window._lastImageSource.data : null);
+  }
+  setResultPhotoDisplay(photo);
+}
+function previewCurrentResultPhoto(){
+  if(!window._currentResultPhoto) return;
+  document.getElementById('pvLightboxImg').src = window._currentResultPhoto;
+  document.getElementById('pvLightbox').classList.add('show');
+}
+function useVisualizationAsResultPhoto(){
+  if(!tilePreview.resultDataUrl){ showToast('لا يوجد صورة جاهزة بعد'); return; }
+  window._lastVisualizationImage = tilePreview.resultDataUrl;
+  showToast('تم إرفاق الصورة — اضغط "حفظ النتيجة" لإتمام الحفظ');
+  nav('screen-result');
+}
+
 /* Initial accessibility pass for static markup (home quick-cards, settings rows) */
 refreshAccessibility();
+
+/* ============== تحميل النتائج المحفوظة من IndexedDB عند الإقلاع ==============
+   يُستدعى مرة واحدة عند فتح التطبيق. يعبّئ savedResults بكل السجلات
+   المخزَّنة فعلياً (الأحدث أولاً، بحسب id تنازلياً — يطابق سلوك
+   unshift السابق) ويُحدِّث شاشة المحفوظات إن كانت هي المعروضة حالياً
+   (حالة نادرة لأن التطبيق يبدأ دائماً من screen-home، لكن تحسباً
+   لأي تنقّل مستقبلي مباشر). */
+async function loadSavedResultsFromDB(){
+  const items = await dbGetAll();
+  items.sort((a,b) => (b.id||0) - (a.id||0));
+  savedResults = items;
+  if(document.getElementById('screen-saved')?.classList.contains('active')){
+    renderSavedList();
+  }
+}
+loadSavedResultsFromDB();
 </script>
 </body>
 </html>
