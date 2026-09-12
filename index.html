@@ -286,6 +286,60 @@
       background-size: 22px 22px; }
   .sw-marble-gray{ background: repeating-linear-gradient(60deg,#eef0f2 0 2px,#dfe3e7 2px 40px), linear-gradient(135deg,#f2f3f5,#e2e5e9); }
 
+  /* ---------- Jabal gallery (real saved tile images) ---------- */
+  .jabal-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:18px;
+  }
+  .jabal-item{
+    border-radius:14px; overflow:hidden; box-shadow:var(--shadow); background:var(--card);
+    display:flex; flex-direction:column;
+  }
+  .jabal-item .jabal-thumb-wrap{
+    aspect-ratio:1/1; position:relative; cursor:pointer; overflow:hidden;
+  }
+  .jabal-item .jabal-thumb-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .jabal-item .jabal-name{
+    padding:8px 8px 4px; font-family:'Cairo',sans-serif; font-weight:700; font-size:12.5px;
+    text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .jabal-item .jabal-actions{
+    display:flex; gap:6px; padding:0 8px 10px;
+  }
+  .jabal-item .jabal-actions button{
+    flex:1; border:none; border-radius:9px; padding:7px 4px; font-family:'Cairo',sans-serif;
+    font-weight:700; font-size:11.5px; cursor:pointer;
+  }
+  .jabal-item .jabal-edit-btn{ background:#1b2740; color:#fff; }
+  [data-theme="light"] .jabal-item .jabal-edit-btn{ background:#e4e9f2; color:#12305e; }
+  .jabal-item .jabal-del-btn{ background:#3a1c1c; color:#ff8f8f; }
+  [data-theme="light"] .jabal-item .jabal-del-btn{ background:#fbe4e4; color:#b23a3a; }
+  .jabal-add-fab{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%); z-index:5;
+    width:auto; padding:13px 26px; border-radius:999px; border:none; cursor:pointer;
+    font-family:'Cairo',sans-serif; font-weight:700; font-size:14px; color:#fff;
+    background:linear-gradient(135deg,var(--blue),#0e4fa3); box-shadow:var(--shadow);
+    display:flex; align-items:center; gap:8px;
+  }
+
+  /* ---------- Simple modal (naming prompt, source pick) ---------- */
+  .app-modal-overlay{
+    position:fixed; inset:0; background:rgba(5,10,20,0.62); z-index:50;
+    display:none; align-items:flex-end; justify-content:center;
+  }
+  .app-modal-overlay.show{ display:flex; }
+  .app-modal-box{
+    width:100%; max-width:460px; background:var(--card); border-radius:20px 20px 0 0;
+    padding:22px 18px 26px; box-shadow:var(--shadow);
+  }
+  .app-modal-box h3{ font-family:'Cairo',sans-serif; font-size:16px; margin:0 0 14px; color:var(--text); }
+  .app-modal-box input[type="text"]{
+    width:100%; border:1.6px solid var(--border); border-radius:12px; padding:13px 14px;
+    font-size:15px; color:var(--text); background:transparent; margin-bottom:14px; box-sizing:border-box;
+  }
+  .app-modal-box input[type="text"]:focus{ outline:2px solid var(--blue); outline-offset:1px; }
+  .app-modal-actions{ display:flex; gap:10px; }
+  .app-modal-actions button{ flex:1; }
+
   /* ---------- Buttons generic ---------- */
   .btn-primary{
     width:100%; border:none; border-radius:14px; padding:15px; font-family:'Cairo',sans-serif;
@@ -537,10 +591,30 @@
     </div>
   </section>
 
+  <!-- ============ TILE SOURCE (choose camera vs Jabal gallery, before calculation) ============ -->
+  <section class="screen" id="screen-tile-source">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>اختر مصدر البلاط</h1>
+    </div>
+    <div class="screen-body">
+      <div class="home-actions" style="padding-top:20px;">
+        <button type="button" class="big-btn btn-camera" onclick="openCamera('count')">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="14" r="3.4" stroke="#fff" stroke-width="1.7"/></svg></span>
+          <span class="txt">تصوير البلاط<small>التقط صورة جديدة للبلاطة ثم قصّها</small></span>
+        </button>
+        <button type="button" class="big-btn btn-preview" onclick="openJabalGalleryPickMode()">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#fff" stroke-width="1.7"/><circle cx="8.5" cy="9.5" r="1.6" stroke="#fff" stroke-width="1.5"/><path d="M21 16l-5.5-5.5a1.5 1.5 0 00-2.1 0L4 19" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+          <span class="txt">اختيار من معرض الجبل<small>بلاطة محفوظة مسبقًا — بدون قص</small></span>
+        </button>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ CAMERA ============ -->
   <section class="screen" id="screen-camera">
     <div class="topbar">
-      <div style="width:34px;height:34px;flex-shrink:0;" aria-hidden="true"></div>
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <h1 id="cameraTitle">التقاط صورة للبلاط</h1>
     </div>
     <div class="screen-body">
@@ -560,20 +634,25 @@
   </section>
 
   <!-- ============ GALLERY / TILE PICK ============ -->
-  <section class="screen" id="screen-gallery">
+  <!-- ============ JABAL GALLERY (real saved tile photos, manage or pick) ============ -->
+  <section class="screen" id="screen-jabal-gallery">
     <div class="topbar">
       <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <h1>اختر من المعرض</h1>
+      <h1 id="jabalGalleryTitle">معرض الجبل</h1>
     </div>
-    <div class="screen-body">
+    <div class="screen-body" style="padding-bottom:90px;">
       <div class="gallery-wrap">
-        <div class="gallery-grid" id="galleryGrid"></div>
-        <button class="btn-primary" onclick="confirmGalleryChoice()">اختيار الصورة</button>
-        <div style="text-align:center;margin-top:14px;">
-          <button class="btn-outline" style="width:auto;padding:10px 18px;font-size:13px;" onclick="document.getElementById('galleryFileInput').click()">أو ارفع صورة من الهاتف</button>
+        <div class="jabal-grid" id="jabalGrid"></div>
+        <div class="empty-state" id="jabalEmptyState" style="display:none;">
+          <div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="9.5" r="1.6" stroke="currentColor" stroke-width="1.5"/><path d="M21 16l-5.5-5.5a1.5 1.5 0 00-2.1 0L4 19" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+          <p>لا توجد بلاطات محفوظة بعد</p>
         </div>
       </div>
     </div>
+    <button class="jabal-add-fab" id="jabalAddFab" type="button" onclick="startJabalAddTile()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+      إضافة بلاطة
+    </button>
   </section>
 
   <!-- ============ ANALYSIS ============ -->
@@ -690,7 +769,7 @@
         <div class="detail-row"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="5" y="5" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.7"/></svg></span><span class="lbl">مساحة البلاطة الواحدة</span><span class="val" id="dTileArea">0.36 م²</span></div>
       </div>
       <div class="bottom-pad">
-        <button class="btn-primary" onclick="nav('screen-result')">متابعة</button>
+        <button class="btn-primary" onclick="proceedToVisualizationFromDetail()">متابعة</button>
       </div>
     </div>
   </section>
@@ -702,9 +781,8 @@
       <h1>النتيجة النهائية</h1>
     </div>
     <div class="screen-body">
-      <div class="pv-thumb-preview" id="resultPhotoBlock" style="display:none;margin-bottom:2px;"><img id="resultPhotoImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
-      <button class="btn-outline" id="resultPhotoPreviewBtn" style="display:none;margin-bottom:8px;" onclick="previewCurrentResultPhoto()">معاينة بالكامل</button>
-      <button class="btn-outline" id="resultPhotoSaveBtn" style="display:none;margin-bottom:8px;" onclick="saveResultPhotoToGallery()">حفظ الصورة في المعرض</button>
+      <div class="pv-thumb-preview" id="resultPhotoBlock" style="margin-bottom:10px;"><img id="resultPhotoImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+      <button class="btn-outline" id="resultPhotoSaveBtn" style="margin-bottom:14px;" onclick="saveResultPhotoToGallery()">حفظ الصورة النهائية بالمعرض</button>
       <div class="stat-card green">
         <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1.4" fill="#fff"/><rect x="13" y="3" width="8" height="8" rx="1.4" fill="#fff" opacity="0.75"/><rect x="3" y="13" width="8" height="8" rx="1.4" fill="#fff" opacity="0.75"/><rect x="13" y="13" width="8" height="8" rx="1.4" fill="#fff" opacity="0.55"/></svg></span>
         <div><div class="val" id="rTileCount">42 بلاطة</div><div class="lbl">عدد البلاط المطلوب</div></div>
@@ -721,7 +799,6 @@
       </div>
       <div class="bottom-pad" style="display:flex;flex-direction:column;gap:10px;">
         <button class="btn-outline" onclick="nav('screen-dims')">تعديل الأبعاد وإعادة الحساب</button>
-        <button class="btn-primary" id="pvFromResultBtn" style="background:linear-gradient(135deg,var(--teal),var(--teal-dark));" onclick="startRoomVisualizationFromResult()">عاين شكل البلاط بالغرفة</button>
         <button class="btn-primary" id="resultActionBtn" style="background:linear-gradient(135deg,var(--green),var(--green-dark));" onclick="saveResult()">حفظ النتيجة</button>
       </div>
     </div>
@@ -771,7 +848,7 @@
         <div class="pv-canvas-wrap"><canvas id="pvResultCanvas"></canvas></div>
         <button class="btn-outline" onclick="openPvLightbox()">معاينة بحجم كامل</button>
         <button class="btn-outline" onclick="nav('screen-pv-mark')">تعديل التحديد</button>
-        <button class="btn-primary" style="background:linear-gradient(135deg,var(--green),var(--green-dark));" onclick="useVisualizationAsResultPhoto()">استخدام هاي الصورة وإكمال الحفظ</button>
+        <button class="btn-primary" style="background:linear-gradient(135deg,var(--green),var(--green-dark));" onclick="useVisualizationAsResultPhoto()">تأكيد وعرض النتيجة النهائية</button>
       </div>
     </div>
   </section>
@@ -781,7 +858,7 @@
     <div class="topbar">
       <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <h1>النتائج المحفوظة</h1>
-      <button class="icon-btn" onclick="clearAllSaved()" aria-label="حذف جميع النتائج المحفوظة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m3 0-1 13a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7h14z" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="icon-btn" onclick="nav('screen-home', true)" aria-label="العودة للصفحة الرئيسية"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 11.5L12 4l8 7.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9a1 1 0 001 1h3v-5h4v5h3a1 1 0 001-1v-9" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
     <div class="screen-body">
       <div id="savedList" style="padding-top:14px;"></div>
@@ -857,6 +934,30 @@
 
 <input type="file" id="galleryFileInput" accept="image/*">
 <input type="file" id="previewFileInput" accept="image/*">
+<input type="file" id="jabalAddFileInput" accept="image/*">
+
+<!-- Jabal gallery: naming modal (after crop, before save) -->
+<div class="app-modal-overlay" id="jabalNameModal">
+  <div class="app-modal-box">
+    <h3>اسم البلاطة</h3>
+    <input type="text" id="jabalNameInput" placeholder="مثال: رخام بيج">
+    <div class="app-modal-actions">
+      <button class="btn-outline" type="button" onclick="closeJabalNameModal()">إلغاء</button>
+      <button class="btn-primary" type="button" onclick="saveJabalNamePrompt()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Jabal gallery: pick source for adding a new tile (camera vs device files) -->
+<div class="app-modal-overlay" id="jabalAddSourceModal">
+  <div class="app-modal-box">
+    <h3>إضافة صورة بلاط</h3>
+    <div class="app-modal-actions">
+      <button class="btn-outline" type="button" onclick="closeJabalAddSourceModal(); openCamera('jabal-add');">تصوير</button>
+      <button class="btn-primary" type="button" onclick="closeJabalAddSourceModal(); document.getElementById('jabalAddFileInput').click();">من الملفات</button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ============== PERSISTENT STORAGE (IndexedDB) ==============
@@ -865,8 +966,9 @@
    الذاكرة عند كل إغلاق). لا يُمسح إلا بحذف بيانات/تثبيت التطبيق.
    لا تبعيات خارجية — IndexedDB مدعومة أصلاً داخل WebView. */
 const DB_NAME = 'AzimuAlJabalDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'savedResults';
+const JABAL_STORE_NAME = 'jabalGallery';
 let _dbInstance = null;
 
 function openDB(){
@@ -878,6 +980,9 @@ function openDB(){
       const db = e.target.result;
       if(!db.objectStoreNames.contains(STORE_NAME)){
         db.createObjectStore(STORE_NAME, {keyPath:'id', autoIncrement:true});
+      }
+      if(!db.objectStoreNames.contains(JABAL_STORE_NAME)){
+        db.createObjectStore(JABAL_STORE_NAME, {keyPath:'id', autoIncrement:true});
       }
     };
     req.onsuccess = (e) => { _dbInstance = e.target.result; resolve(_dbInstance); };
@@ -965,10 +1070,74 @@ async function dbClear(){
   }
 }
 
+/* ============== JABAL GALLERY STORAGE (نفس قاعدة البيانات، مخزن منفصل) ============== */
+async function dbGalleryGetAll(){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(JABAL_STORE_NAME, 'readonly');
+      const store = tx.objectStore(JABAL_STORE_NAME);
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }catch(err){
+    console.warn('IndexedDB dbGalleryGetAll فشلت:', err);
+    return [];
+  }
+}
+
+async function dbGalleryAdd(item){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(JABAL_STORE_NAME, 'readwrite');
+      const store = tx.objectStore(JABAL_STORE_NAME);
+      const req = store.add(item);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }catch(err){
+    console.warn('IndexedDB dbGalleryAdd فشلت:', err);
+    return null;
+  }
+}
+
+async function dbGalleryPut(item){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(JABAL_STORE_NAME, 'readwrite');
+      const store = tx.objectStore(JABAL_STORE_NAME);
+      const req = store.put(item);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }catch(err){
+    console.warn('IndexedDB dbGalleryPut فشلت:', err);
+    return null;
+  }
+}
+
+async function dbGalleryDelete(id){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(JABAL_STORE_NAME, 'readwrite');
+      const store = tx.objectStore(JABAL_STORE_NAME);
+      const req = store.delete(id);
+      req.onsuccess = () => resolve(true);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }catch(err){
+    console.warn('IndexedDB dbGalleryDelete فشلت:', err);
+    return false;
+  }
+}
+
 /* ============== APP STATE ============== */
 let history_stack = ['screen-home'];
 let currentImageCSS = 'sw-marble-beige';
-let selectedGallerySwatch = 'sw-marble-beige';
 let currentTileSizeCm = 60;
 let currentTileShape = 'square';
 let rectPreset = {w:30, h:60};
@@ -996,8 +1165,8 @@ function nav(id, replace){
   if(replace){ history_stack[history_stack.length-1] = id; }
   else{ history_stack.push(id); }
   if(id === 'screen-saved') renderSavedList();
-  if(id === 'screen-gallery') renderGalleryGrid();
-  if(id === 'screen-result'){ updateResultActionButton(); updatePreviewButtonVisibility(); refreshResultPhotoDisplay(); }
+  if(id === 'screen-jabal-gallery') renderJabalGrid();
+  if(id === 'screen-result'){ updateResultActionButton(); refreshResultPhotoDisplay(); }
   refreshAccessibility();
 }
 function goBack(){
@@ -1070,6 +1239,10 @@ function openCamera(mode){
     titleEl.textContent = 'تصوير البلاطة';
     hintEl.textContent = 'وجّه الكاميرا نحو البلاطة ثم اضغط للالتقاط';
     galBtn.onclick = ()=> triggerPreviewFilePick('tile');
+  } else if(window._camMode === 'jabal-add'){
+    titleEl.textContent = 'تصوير بلاطة لمعرض الجبل';
+    hintEl.textContent = 'وجّه الكاميرا نحو البلاط ثم اضغط لالتقاط صورة';
+    galBtn.onclick = ()=> document.getElementById('jabalAddFileInput').click();
   } else {
     titleEl.textContent = 'التقاط صورة للبلاط';
     hintEl.textContent = 'وجّه الكاميرا نحو البلاط ثم اضغط لالتقاط صورة';
@@ -1121,6 +1294,7 @@ function captureShot(){
     handleCapturedPhoto(dataUrl);
   } else {
     if(window._camMode === 'preview-room') triggerPreviewFilePick('room');
+    else if(window._camMode === 'jabal-add') document.getElementById('jabalAddFileInput').click();
     else triggerPreviewFilePick('tile');
   }
 }
@@ -1131,6 +1305,7 @@ function handleCapturedPhoto(dataUrl){
     nav('screen-pv-mark');
     initMarkScreen();
   } else {
+    if(window._camMode === 'jabal-add'){ window._cropMode = 'jabal-add'; }
     tilePreview.tileRawData = dataUrl;
     nav('screen-pv-crop');
     initCropScreen();
@@ -1148,37 +1323,6 @@ document.getElementById('galleryFileInput').addEventListener('change', function(
   reader.readAsDataURL(file);
   e.target.value = '';
 });
-
-/* ---------- Gallery swatches ---------- */
-const swatchDefs = [
-  {cls:'sw-marble-beige', label:'رخام بيج'},
-  {cls:'sw-graphite', label:'غرافيت'},
-  {cls:'sw-sand', label:'رملي'},
-  {cls:'sw-slate', label:'أردوازي'},
-  {cls:'sw-terrazzo', label:'تيرازو'},
-  {cls:'sw-wood', label:'خشبي'},
-  {cls:'sw-lightgray', label:'رمادي فاتح'},
-  {cls:'sw-hex', label:'سداسي'},
-  {cls:'sw-marble-gray', label:'رخام رمادي'}
-];
-function renderGalleryGrid(){
-  const grid = document.getElementById('galleryGrid');
-  grid.innerHTML = '';
-  swatchDefs.forEach(sw=>{
-    const div = document.createElement('div');
-    const isSelected = sw.cls===selectedGallerySwatch;
-    div.className = 'swatch ' + sw.cls + (isSelected ? ' selected':'');
-    div.setAttribute('aria-label', sw.label + (isSelected ? '، محدد' : ''));
-    div.setAttribute('aria-pressed', String(isSelected));
-    div.onclick = ()=>{ selectedGallerySwatch = sw.cls; renderGalleryGrid(); };
-    div.innerHTML = `<div class="check">✓</div><div class="lbl">${sw.label}</div>`;
-    grid.appendChild(div);
-  });
-  refreshAccessibility();
-}
-function confirmGalleryChoice(){
-  startAnalysis({type:'swatch', data:selectedGallerySwatch});
-}
 
 /* ---------- Analysis ---------- */
 let tileTypeGuess = 'مربّع';
@@ -1483,15 +1627,16 @@ function computeAutoRepeats(calc){
   }
   return {rx:6, ry:6}; // fallback when exact dims aren't available (e.g. triangle/other tile shapes)
 }
-function updatePreviewButtonVisibility(){
-  const btn = document.getElementById('pvFromResultBtn');
-  if(!btn) return;
-  const {tileImg} = getActiveTileImageAndCalc();
-  btn.style.display = tileImg ? '' : 'none';
-}
-function startRoomVisualizationFromResult(){
+/* بعد شاشة التفاصيل (screen-detail) — خطوة وضع البلاط بالغرفة إلزامية دائمًا،
+   بدون أي تخطٍّ، قبل الوصول لشاشة النتيجة النهائية. runCalculation() نُفّذ مسبقًا
+   فـlastCalc جاهز، لذا computeAutoRepeats() يعمل بالخلفية فورًا هنا. */
+function proceedToVisualizationFromDetail(){
   const {tileImg, calc} = getActiveTileImageAndCalc();
-  if(!tileImg){ showToast('هاي الميزة تحتاج صورة حقيقية للبلاط'); return; }
+  if(!tileImg){
+    // حالة نادرة جداً (لا صورة بلاط متاحة إطلاقاً) — لا مسار بديل، نُنبّه ونبقى بالشاشة
+    showToast('تعذّر إيجاد صورة البلاط لإكمال المعاينة');
+    return;
+  }
   const {rx, ry} = computeAutoRepeats(calc);
   tilePreview = {
     roomImageData:null,
@@ -1534,7 +1679,12 @@ const homeActionsConfig = [
   {
     id:'start', className:'btn-camera', label:'احسب البلاط وعاين شكله', sub:'صوّر البلاط، احسب الكمية، وشوف شكله بغرفتك',
     icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="14" r="3.4" stroke="#fff" stroke-width="1.7"/></svg>',
-    onClick: ()=>openCamera('count')
+    onClick: ()=>nav('screen-tile-source')
+  },
+  {
+    id:'jabal-gallery', className:'btn-preview', label:'إضافة صور بلاط لمعرض الجبل', sub:'احفظ صور بلاط جاهزة لإعادة استخدامها لاحقًا',
+    icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="#fff" stroke-width="1.7"/><circle cx="8.5" cy="9.5" r="1.6" stroke="#fff" stroke-width="1.5"/><path d="M21 16l-5.5-5.5a1.5 1.5 0 00-2.1 0L4 19" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg>',
+    onClick: ()=>openJabalGalleryManage()
   },
   {
     id:'saved', className:'btn-saved', label:'المحفوظات', sub:'النتائج المحفوظة سابقًا',
@@ -1714,6 +1864,11 @@ function confirmCrop(){
   out.getContext('2d').drawImage(cropImg, left, top, w, h, 0, 0, w, h);
   const croppedDataUrl = out.toDataURL('image/jpeg', 0.92);
   window._lastCroppedTileImage = croppedDataUrl;
+  if(window._cropMode === 'jabal-add'){
+    window._cropMode = null;
+    openJabalNamePrompt(croppedDataUrl);
+    return;
+  }
   startAnalysis({type:'photo', data:croppedDataUrl});
 }
 
@@ -1897,17 +2052,15 @@ function closePvLightbox(){
 function setResultPhotoDisplay(photoUrl){
   window._currentResultPhoto = photoUrl || null;
   const block = document.getElementById('resultPhotoBlock');
-  const btn = document.getElementById('resultPhotoPreviewBtn');
   const saveBtn = document.getElementById('resultPhotoSaveBtn');
   const img = document.getElementById('resultPhotoImg');
   if(photoUrl){
     img.src = photoUrl;
     block.style.display = '';
-    btn.style.display = '';
     saveBtn.style.display = '';
   } else {
+    // حالة نادرة جداً فقط (تعذّر توفّر صورة مركّبة) — الآن الصورة إلزامية دائماً بالمسار العادي
     block.style.display = 'none';
-    btn.style.display = 'none';
     saveBtn.style.display = 'none';
   }
 }
@@ -1935,16 +2088,11 @@ function refreshResultPhotoDisplay(){
   }
   setResultPhotoDisplay(photo);
 }
-function previewCurrentResultPhoto(){
-  if(!window._currentResultPhoto) return;
-  document.getElementById('pvLightboxImg').src = window._currentResultPhoto;
-  document.getElementById('pvLightbox').classList.add('show');
-}
+/* من screen-pv-result بعد تركيب الصورة — الخطوة الإلزامية قبل شاشة النتيجة النهائية (البند د). */
 function useVisualizationAsResultPhoto(){
   if(!tilePreview.resultDataUrl){ showToast('لا يوجد صورة جاهزة بعد'); return; }
   window._lastVisualizationImage = tilePreview.resultDataUrl;
-  showToast('تم إرفاق الصورة — اضغط "حفظ النتيجة" لإتمام الحفظ');
-  nav('screen-result');
+  nav('screen-result', true);
 }
 
 /* Initial accessibility pass for static markup (home quick-cards, settings rows) */
@@ -1965,6 +2113,163 @@ async function loadSavedResultsFromDB(){
   }
 }
 loadSavedResultsFromDB();
+
+/* ================= JABAL GALLERY (معرض الجبل — بلاطات حقيقية جاهزة لإعادة الاستخدام) ================= */
+let jabalGalleryItems = [];   // {id, name, image(dataURL), date}
+let jabalGalleryMode = 'manage'; // 'manage' | 'pick'
+let jabalEditingId = null;    // id being edited, or null when adding new
+
+async function loadJabalGalleryFromDB(){
+  const items = await dbGalleryGetAll();
+  items.sort((a,b) => (b.id||0) - (a.id||0));
+  jabalGalleryItems = items;
+  if(document.getElementById('screen-jabal-gallery')?.classList.contains('active')){
+    renderJabalGrid();
+  }
+}
+loadJabalGalleryFromDB();
+
+/* افتح شاشة معرض الجبل بوضع "إدارة" (من الرئيسية) */
+function openJabalGalleryManage(){
+  jabalGalleryMode = 'manage';
+  document.getElementById('jabalGalleryTitle').textContent = 'معرض الجبل';
+  document.getElementById('jabalAddFab').style.display = 'flex';
+  nav('screen-jabal-gallery');
+  renderJabalGrid();
+}
+
+/* افتح شاشة معرض الجبل بوضع "اختيار" — من شاشة اختيار مصدر البلاط (screen-tile-source) */
+function openJabalGalleryPickMode(){
+  jabalGalleryMode = 'pick';
+  document.getElementById('jabalGalleryTitle').textContent = 'اختر بلاطة من المعرض';
+  document.getElementById('jabalAddFab').style.display = 'none';
+  nav('screen-jabal-gallery');
+  renderJabalGrid();
+}
+
+function renderJabalGrid(){
+  const grid = document.getElementById('jabalGrid');
+  const empty = document.getElementById('jabalEmptyState');
+  if(jabalGalleryItems.length===0){
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = jabalGalleryItems.map(item => `
+    <div class="jabal-item">
+      <div class="jabal-thumb-wrap" onclick="handleJabalItemClick(${item.id})" aria-label="${jabalGalleryMode==='pick' ? 'اختيار' : 'عرض'} ${escapeHtml(item.name)}">
+        <img src="${item.image}" alt="${escapeHtml(item.name)}">
+      </div>
+      <div class="jabal-name">${escapeHtml(item.name)}</div>
+      ${jabalGalleryMode==='manage' ? `
+      <div class="jabal-actions">
+        <button type="button" class="jabal-edit-btn" onclick="startJabalEditTile(${item.id})">تعديل</button>
+        <button type="button" class="jabal-del-btn" onclick="deleteJabalTile(${item.id})">حذف</button>
+      </div>` : ``}
+    </div>
+  `).join('');
+  refreshAccessibility();
+}
+
+function handleJabalItemClick(id){
+  if(jabalGalleryMode === 'pick'){
+    pickJabalTileForCalculation(id);
+  }
+  // بوضع الإدارة، الضغط على الصورة نفسها لا يفعل شيئًا إضافيًا (التعديل/الحذف عبر أزرارهما)
+}
+
+/* اختيار بلاطة جاهزة أثناء مسار الحساب — تُستخدم مباشرة بدون أي قص (محفوظة مسبقًا مقصوصة) */
+function pickJabalTileForCalculation(id){
+  const item = jabalGalleryItems.find(t => t.id === id);
+  if(!item) return;
+  startAnalysis({type:'photo', data: item.image});
+}
+
+/* ---------- إضافة بلاطة جديدة لمعرض الجبل ---------- */
+function startJabalAddTile(){
+  jabalEditingId = null;
+  document.getElementById('jabalAddSourceModal').classList.add('show');
+}
+function closeJabalAddSourceModal(){
+  document.getElementById('jabalAddSourceModal').classList.remove('show');
+}
+document.getElementById('jabalAddFileInput').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    tilePreview.tileRawData = ev.target.result;
+    window._cropMode = 'jabal-add';
+    nav('screen-pv-crop');
+    initCropScreen();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+/* تعديل بلاطة موجودة: يفتح نفس اختيار المصدر (تصوير/ملفات) ثم القص، ثم يستبدل الصورة بنفس id */
+function startJabalEditTile(id){
+  jabalEditingId = id;
+  document.getElementById('jabalAddSourceModal').classList.add('show');
+}
+
+/* بعد القص (سواء إضافة جديدة أو تعديل) — اعرض حقل الاسم */
+function openJabalNamePrompt(croppedDataUrl){
+  window._pendingJabalImage = croppedDataUrl;
+  const input = document.getElementById('jabalNameInput');
+  if(jabalEditingId != null){
+    const existing = jabalGalleryItems.find(t => t.id === jabalEditingId);
+    input.value = existing ? existing.name : '';
+  } else {
+    input.value = '';
+  }
+  document.getElementById('jabalNameModal').classList.add('show');
+  setTimeout(()=> input.focus(), 50);
+}
+function closeJabalNameModal(){
+  document.getElementById('jabalNameModal').classList.remove('show');
+  window._pendingJabalImage = null;
+}
+async function saveJabalNamePrompt(){
+  const name = document.getElementById('jabalNameInput').value.trim();
+  if(!name){ showToast('أدخل اسم البلاطة'); return; }
+  const image = window._pendingJabalImage;
+  if(!image){ closeJabalNameModal(); return; }
+  const dateStr = new Date().toLocaleDateString('ar-SY', {year:'numeric', month:'2-digit', day:'2-digit'});
+  if(jabalEditingId != null){
+    const existing = jabalGalleryItems.find(t => t.id === jabalEditingId);
+    if(existing){
+      existing.name = name;
+      existing.image = image;
+      existing.date = dateStr;
+      dbGalleryPut(existing);
+    }
+  } else {
+    const newItem = { name, image, date: dateStr };
+    jabalGalleryItems.unshift(newItem);
+    dbGalleryAdd(newItem).then(id => { if(id!=null) newItem.id = id; });
+  }
+  jabalEditingId = null;
+  window._pendingJabalImage = null;
+  closeJabalNameModal();
+  renderJabalGrid();
+  showToast('تم حفظ البلاطة بمعرض الجبل');
+  nav('screen-jabal-gallery', true);
+}
+
+function deleteJabalTile(id){
+  const idx = jabalGalleryItems.findIndex(t => t.id === id);
+  if(idx === -1) return;
+  const removed = jabalGalleryItems.splice(idx,1)[0];
+  renderJabalGrid();
+  if(removed && removed.id!=null) dbGalleryDelete(removed.id);
+  showToast('تم حذف البلاطة', 'تراجع', ()=>{
+    jabalGalleryItems.splice(idx,0,removed);
+    renderJabalGrid();
+    if(removed && removed.id!=null) dbGalleryPut(removed); else if(removed) dbGalleryAdd(removed).then(id=>{ if(id!=null) removed.id=id; });
+  });
+}
 </script>
 </body>
 </html>
