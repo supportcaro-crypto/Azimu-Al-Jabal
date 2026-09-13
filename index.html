@@ -543,6 +543,27 @@
     background:rgba(255,255,255,0.15); border:none; color:#fff; display:flex;align-items:center;justify-content:center; cursor:pointer; font-size:16px;
   }
 
+  /* ---------- Tile-visualize loading + raw log screen ---------- */
+  .pv-loading-wrap{ display:flex; flex-direction:column; align-items:center; gap:16px; padding-top:8px; }
+  .pv-loading-spinner{ width:38px; height:38px; border-width:4px; }
+  .pv-loading-status{ font-family:'Cairo',sans-serif; font-weight:800; font-size:14.5px; text-align:center; margin:0; }
+  .pv-loading-status.err{ color:#e05555; }
+  .pv-log-box{
+    width:100%; background:#0b1220; border:1px solid #1e2b42; border-radius:12px;
+    padding:10px; box-sizing:border-box;
+  }
+  .pv-log-box-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .pv-log-box-head span{ font-size:11px; color:#7d93b2; font-weight:700; }
+  .pv-log-copy{
+    background:rgba(255,255,255,0.08); border:none; color:#cfe0ff; font-size:10.5px;
+    border-radius:6px; padding:3px 9px; cursor:pointer; font-family:'Cairo',sans-serif; font-weight:700;
+  }
+  #pvLoadingLog{
+    direction:ltr; text-align:left; margin:0; max-height:260px; overflow-y:auto;
+    font-family:ui-monospace,'SFMono-Regular',Consolas,monospace; font-size:11px; line-height:1.6;
+    color:#8fe0a0; white-space:pre-wrap; word-break:break-all;
+  }
+
   input[type=file]{ display:none; }
   ::selection{ background:var(--blue); color:#fff; }
 
@@ -843,6 +864,30 @@
         <div class="pv-canvas-wrap"><canvas id="pvCropCanvas"></canvas></div>
         <button class="btn-outline" onclick="resetCropHandles()">إعادة الضبط</button>
         <button class="btn-primary" onclick="confirmCrop()">قص الصورة والمتابعة</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TILE PREVIEW: LOADING + RAW LOG ============ -->
+  <section class="screen" id="screen-pv-loading">
+    <div class="topbar">
+      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1>جاري التحميل</h1>
+    </div>
+    <div class="screen-body">
+      <div class="pv-wrap">
+        <div class="pv-loading-wrap">
+          <div class="spinner pv-loading-spinner" id="pvLoadingSpinner"></div>
+          <p class="pv-loading-status" id="pvLoadingStatus">جاري تركيب البلاط بالذكاء الاصطناعي... قد يستغرق دقيقة</p>
+          <div class="pv-log-box">
+            <div class="pv-log-box-head">
+              <span>الرد الخام من السيرفر (Log)</span>
+              <button class="pv-log-copy" type="button" onclick="pvCopyLog()">نسخ</button>
+            </div>
+            <pre id="pvLoadingLog"></pre>
+          </div>
+          <button class="btn-outline" id="pvLoadingRetryBtn" style="display:none;" onclick="runAiTileVisualization()">إعادة المحاولة</button>
+        </div>
       </div>
     </div>
   </section>
@@ -1823,12 +1868,52 @@ function drawResultCanvasFromDataUrl(){
   img.src = tilePreview.resultDataUrl;
 }
 
+/* ---------- شاشة "جاري التحميل" + صندوق اللوغ الخام ---------- */
+function pvLogClear(){
+  const el = document.getElementById('pvLoadingLog');
+  if(el) el.textContent = '';
+}
+function pvLog(msg){
+  const el = document.getElementById('pvLoadingLog');
+  if(!el) return;
+  const time = new Date().toTimeString().slice(0,8);
+  el.textContent += `[${time}] ${msg}\n`;
+  el.scrollTop = el.scrollHeight;
+}
+function pvCopyLog(){
+  const el = document.getElementById('pvLoadingLog');
+  if(!el || !el.textContent) return;
+  const done = ()=> showToast('تم نسخ اللوغ');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(el.textContent).then(done).catch(()=>showToast('تعذّر النسخ'));
+  } else {
+    showToast('النسخ غير مدعوم على هذا المتصفح');
+  }
+}
+function pvSetLoadingUiState(state, statusMsg){
+  // state: 'loading' | 'error'
+  const spinner = document.getElementById('pvLoadingSpinner');
+  const statusEl = document.getElementById('pvLoadingStatus');
+  const retryBtn = document.getElementById('pvLoadingRetryBtn');
+  if(statusEl){ statusEl.textContent = statusMsg; statusEl.classList.toggle('err', state === 'error'); }
+  if(spinner) spinner.style.display = (state === 'loading') ? '' : 'none';
+  if(retryBtn) retryBtn.style.display = (state === 'error') ? '' : 'none';
+}
+
 async function runAiTileVisualization(){
   if(!tilePreview.roomImageData || !tilePreview.tileImageData){
     showToast('الصورتين مطلوبتين لإتمام المعاينة');
     return;
   }
-  showToast('جاري تركيب البلاط بالذكاء الاصطناعي... قد يستغرق دقيقة');
+  // إذا كنا أصلاً على شاشة التحميل أو شاشة النتيجة (إعادة محاولة) نستبدل الشاشة
+  // الحالية بدل تكديس شاشات تحميل فوق بعض بتاريخ التصفح.
+  const curActive = document.querySelector('.screen.active');
+  const curId = curActive ? curActive.id : null;
+  const replaceScreen = (curId === 'screen-pv-loading' || curId === 'screen-pv-result');
+  nav('screen-pv-loading', replaceScreen);
+  pvLogClear();
+  pvSetLoadingUiState('loading', 'جاري تركيب البلاط بالذكاء الاصطناعي... قد يستغرق دقيقة');
+  pvLog('➡️ POST ' + JABAL_SERVER_BASE + '/jabal-api/tile-visualize');
   try{
     const res = await fetch(JABAL_SERVER_BASE + '/jabal-api/tile-visualize', {
       method: 'POST',
@@ -1839,15 +1924,27 @@ async function runAiTileVisualization(){
         tileImageBase64: _jabalStripDataUrlPrefix(tilePreview.tileImageData)
       })
     });
-    const data = await res.json();
+    const rawText = await res.text();
+    pvLog('⬅️ HTTP ' + res.status + ' ' + res.statusText);
+    pvLog(rawText || '(رد فارغ بلا محتوى)');
+    let data;
+    try{
+      data = JSON.parse(rawText);
+    }catch(parseErr){
+      throw new Error('الرد من السيرفر ليس JSON صالح (HTTP ' + res.status + ' ' + res.statusText + ') — شوف الصندوق أعلاه للرد الخام كامل');
+    }
     if(!data.success) throw new Error(data.error || 'فشل تركيب البلاط');
     tilePreview.resultDataUrl = 'data:image/jpeg;base64,' + data.resultImageBase64;
     drawResultCanvasFromDataUrl();
-    nav('screen-pv-result');
+    nav('screen-pv-result', true);
     beep();
   }catch(err){
+    // خطأ شبكة (fetch نفسه رمى استثناء قبل ما يوصل رد أصلاً) بيوصل هون
+    // بدون أي "HTTP xxx" باللوغ فوق — هيك تعرف إذا المشكلة قبل ما تطلع
+    // من الجهاز أصلاً (DNS/CORS/انقطاع اتصال) أو بعد ما السيرفر رد فعلاً.
     console.error('[Jabal AI] خطأ:', err.message);
-    showToast('تعذّر تركيب البلاط، تأكد من الاتصال بالإنترنت وحاول مجددًا');
+    pvLog('❌ ' + (err.name || 'Error') + ': ' + err.message);
+    pvSetLoadingUiState('error', 'تعذّر تركيب البلاط — التفاصيل الكاملة بالصندوق أعلاه');
   }
 }
 
