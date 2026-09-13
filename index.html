@@ -847,23 +847,6 @@
     </div>
   </section>
 
-  <!-- ============ TILE PREVIEW: MARK FLOOR CORNERS ============ -->
-  <section class="screen" id="screen-pv-mark">
-    <div class="topbar">
-      <button class="back" onclick="goBack()" type="button" aria-label="رجوع"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <h1>تحديد الأرضية</h1>
-    </div>
-    <div class="screen-body">
-      <div class="pv-wrap">
-        <p class="pv-hint">حرّك النقاط الأربع لتطابق زوايا الأرضية بالضبط — بأي ترتيب وبأي وقت تحب.</p>
-        <div class="pv-canvas-wrap"><canvas id="pvMarkCanvas"></canvas></div>
-        <button class="btn-outline" onclick="resetMarkHandles()">إعادة الضبط</button>
-
-        <button class="btn-primary" style="background:linear-gradient(135deg,var(--teal),var(--teal-dark));" onclick="generatePreviewResult()">ركّب البلاط الآن</button>
-      </div>
-    </div>
-  </section>
-
   <!-- ============ TILE PREVIEW: RESULT ============ -->
   <section class="screen" id="screen-pv-result">
     <div class="topbar">
@@ -874,7 +857,7 @@
       <div class="pv-wrap">
         <div class="pv-canvas-wrap"><canvas id="pvResultCanvas"></canvas></div>
         <button class="btn-outline" onclick="openPvLightbox()">معاينة بحجم كامل</button>
-        <button class="btn-outline" onclick="nav('screen-pv-mark')">تعديل التحديد</button>
+        <button class="btn-outline" onclick="runAiTileVisualization()">إعادة المحاولة</button>
         <button class="btn-primary" style="background:linear-gradient(135deg,var(--green),var(--green-dark));" onclick="useVisualizationAsResultPhoto()">تأكيد وعرض النتيجة النهائية</button>
       </div>
     </div>
@@ -961,7 +944,7 @@
     <div class="screen-body">
       <div class="about-wrap" style="text-align:right;">
         <p style="color:var(--text);font-size:13.5px;line-height:2;">
-          يحترم تطبيق "عظيمو الجبل" خصوصيتك بالكامل. جميع الصور التي تلتقطها أو تختارها (صور البلاط وصور الغرفة)، وكل نتائج الحسابات ومعرض الجبل الخاص بك، تُخزَّن محليًا فقط على جهازك ولا تُرسَل إلى أي خادم خارجي أو طرف ثالث.
+          يحترم تطبيق "عظيمو الجبل" خصوصيتك. كل نتائج الحسابات ومعرض الجبل الخاص بك تُخزَّن محليًا على جهازك. أما ميزة "معاينة البلاط بالذكاء الاصطناعي" فتحتاج إرسال صورة الغرفة وصورة البلاطة مؤقتًا إلى خادم معالجة متخصص لتوليد نتيجة واقعية، وتُحذف هذه الصور فور الانتهاء من المعالجة ولا تُخزَّن بشكل دائم أو تُشارَك مع أي طرف آخر.
         </p>
         <p style="color:var(--text);font-size:13.5px;line-height:2;">
           لا يجمع التطبيق أي بيانات شخصية، ولا يتطلب إنشاء حساب أو تسجيل دخول، ولا يستخدم أي وسائل تتبّع أو إعلانات. يمكنك حذف كل بياناتك المحفوظة بالتطبيق بالكامل في أي وقت من خلال حذف بيانات التطبيق أو إلغاء تثبيته من جهازك.
@@ -1351,8 +1334,7 @@ function captureShot(){
 function handleCapturedPhoto(dataUrl){
   if(window._camMode === 'preview-room'){
     tilePreview.roomImageData = dataUrl;
-    nav('screen-pv-mark');
-    initMarkScreen();
+    runAiTileVisualization();
   } else {
     if(window._camMode === 'jabal-add'){ window._cropMode = 'jabal-add'; }
     tilePreview.tileRawData = dataUrl;
@@ -1811,8 +1793,7 @@ document.getElementById('previewFileInput').addEventListener('change', function(
   reader.onload = function(ev){
     if(_previewFileTarget === 'room'){
       tilePreview.roomImageData = ev.target.result;
-      nav('screen-pv-mark');
-      initMarkScreen();
+      runAiTileVisualization();
     } else if(_previewFileTarget === 'tile'){
       tilePreview.tileRawData = ev.target.result;
       nav('screen-pv-crop');
@@ -1823,303 +1804,54 @@ document.getElementById('previewFileInput').addEventListener('change', function(
   e.target.value = '';
 });
 
-/* ---------- Homography helpers: unit square -> quad, and its inverse ---------- */
-function pvComputeSquareToQuad(p0,p1,p2,p3){
-  const dx1=p1.x-p2.x, dx2=p3.x-p2.x, dx3=p0.x-p1.x+p2.x-p3.x;
-  const dy1=p1.y-p2.y, dy2=p3.y-p2.y, dy3=p0.y-p1.y+p2.y-p3.y;
-  let a13=0, a23=0;
-  if(Math.abs(dx3)>1e-10 || Math.abs(dy3)>1e-10){
-    const det = dx1*dy2 - dx2*dy1;
-    a13 = (dx3*dy2 - dx2*dy3) / det;
-    a23 = (dx1*dy3 - dx3*dy1) / det;
-  }
-  const a11=p1.x-p0.x+a13*p1.x, a21=p3.x-p0.x+a23*p3.x, a31=p0.x;
-  const a12=p1.y-p0.y+a13*p1.y, a22=p3.y-p0.y+a23*p3.y, a32=p0.y;
-  return [a11,a21,a31, a12,a22,a32, a13,a23,1];
-}
-function pvInvert3x3(m){
-  const [a,b,c,d,e,f,g,h,i]=m;
-  const A=e*i-f*h, B=-(d*i-f*g), C=d*h-e*g;
-  const D=-(b*i-c*h), E=a*i-c*g, F=-(a*h-b*g);
-  const G=b*f-c*e, H=-(a*f-c*d), I=a*e-b*d;
-  const det=a*A+b*B+c*C;
-  return [A/det,D/det,G/det, B/det,E/det,H/det, C/det,F/det,I/det];
-}
-function pvApplyMatrix(m,x,y){
-  const [a,b,c,d,e,f,g,h,i]=m;
-  const X=a*x+b*y+c, Y=d*x+e*y+f, W=g*x+h*y+i;
-  return {x:X/W, y:Y/W};
+/* ---------- AI Tile Visualization (server-side kontext model) ---------- */
+const JABAL_SERVER_BASE = 'https://mahmoud08808665888888m-an-experience.hf.space'; // نفس GATEWAY_PUBLIC_URL — إذا تغيّر رابط السيرفر مستقبلاً، عدّل هون فقط
+const JABAL_API_KEY_CLIENT = 'd616857e4bde9b87422f2f47bba93dbbbdfcea48cd59cccc'; // لازم يطابق قيمة env var JABAL_API_KEY على السيرفر بالضبط
+
+function _jabalStripDataUrlPrefix(dataUrl){
+  const idx = dataUrl.indexOf(',');
+  return idx>=0 ? dataUrl.slice(idx+1) : dataUrl;
 }
 
-/* ---------- Crop screen (remove edges/background from the tile photo) ---------- */
-let cropImg = null;
-let cropRect = null;
-let cropDragHandle = null;
-let cropDragOffset = null;
-
-function initCropScreen(){
-  const canvas = document.getElementById('pvCropCanvas');
+function drawResultCanvasFromDataUrl(){
+  const canvas = document.getElementById('pvResultCanvas');
+  if(!canvas || !tilePreview.resultDataUrl) return;
+  const ctx = canvas.getContext('2d');
   const img = new Image();
   img.onload = ()=>{
-    cropImg = img;
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
-    resetCropHandles();
+    ctx.drawImage(img, 0, 0);
   };
-  img.src = tilePreview.tileRawData;
+  img.src = tilePreview.resultDataUrl;
 }
-function resetCropHandles(){
-  if(!cropImg) return;
-  const w = cropImg.naturalWidth, h = cropImg.naturalHeight;
-  cropRect = { left: w*0.1, top: h*0.1, right: w*0.9, bottom: h*0.9 };
-  drawCropCanvas();
-}
-function drawCropCanvas(){
-  const canvas = document.getElementById('pvCropCanvas');
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(cropImg, 0, 0);
-  const {left,top,right,bottom} = cropRect;
-  ctx.fillStyle = 'rgba(5,10,20,0.55)';
-  ctx.fillRect(0,0,canvas.width, top);
-  ctx.fillRect(0,bottom,canvas.width, canvas.height-bottom);
-  ctx.fillRect(0,top,left, bottom-top);
-  ctx.fillRect(right,top,canvas.width-right, bottom-top);
-  ctx.strokeStyle = '#e8a33d';
-  ctx.lineWidth = Math.max(2, canvas.width*0.004);
-  ctx.strokeRect(left, top, right-left, bottom-top);
-  const hs = Math.max(10, canvas.width*0.02);
-  ctx.fillStyle = '#e8a33d';
-  [[left,top],[right,top],[left,bottom],[right,bottom]].forEach(([x,y])=>{
-    ctx.beginPath(); ctx.arc(x,y,hs,0,Math.PI*2); ctx.fill();
-  });
-}
-function getCropCanvasPoint(evt){
-  const canvas = document.getElementById('pvCropCanvas');
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-  return { x:(evt.clientX-rect.left)*scaleX, y:(evt.clientY-rect.top)*scaleY };
-}
-(function setupCropPointerEvents(){
-  const canvas = document.getElementById('pvCropCanvas');
-  canvas.addEventListener('pointerdown', e=>{
-    if(!cropRect) return;
-    canvas.setPointerCapture(e.pointerId);
-    const p = getCropCanvasPoint(e);
-    const hs = Math.max(18, canvas.width*0.04);
-    const {left,top,right,bottom} = cropRect;
-    const dist=(x,y)=>Math.hypot(p.x-x,p.y-y);
-    if(dist(left,top)<hs) cropDragHandle='tl';
-    else if(dist(right,top)<hs) cropDragHandle='tr';
-    else if(dist(left,bottom)<hs) cropDragHandle='bl';
-    else if(dist(right,bottom)<hs) cropDragHandle='br';
-    else if(p.x>left && p.x<right && p.y>top && p.y<bottom){
-      cropDragHandle='move';
-      cropDragOffset = {x:p.x-left, y:p.y-top, w:right-left, h:bottom-top};
-    } else cropDragHandle=null;
-  });
-  canvas.addEventListener('pointermove', e=>{
-    if(!cropDragHandle || !cropRect) return;
-    const p = getCropCanvasPoint(e);
-    const w = canvas.width, h = canvas.height;
-    const cx = Math.max(0, Math.min(w, p.x)), cy = Math.max(0, Math.min(h, p.y));
-    if(cropDragHandle==='tl'){ cropRect.left=Math.min(cx,cropRect.right-20); cropRect.top=Math.min(cy,cropRect.bottom-20); }
-    else if(cropDragHandle==='tr'){ cropRect.right=Math.max(cx,cropRect.left+20); cropRect.top=Math.min(cy,cropRect.bottom-20); }
-    else if(cropDragHandle==='bl'){ cropRect.left=Math.min(cx,cropRect.right-20); cropRect.bottom=Math.max(cy,cropRect.top+20); }
-    else if(cropDragHandle==='br'){ cropRect.right=Math.max(cx,cropRect.left+20); cropRect.bottom=Math.max(cy,cropRect.top+20); }
-    else if(cropDragHandle==='move'){
-      let nx = cx-cropDragOffset.x, ny = cy-cropDragOffset.y;
-      nx = Math.max(0, Math.min(w-cropDragOffset.w, nx));
-      ny = Math.max(0, Math.min(h-cropDragOffset.h, ny));
-      cropRect.left=nx; cropRect.top=ny; cropRect.right=nx+cropDragOffset.w; cropRect.bottom=ny+cropDragOffset.h;
-    }
-    drawCropCanvas();
-  });
-  ['pointerup','pointercancel'].forEach(ev=>canvas.addEventListener(ev, ()=>{ cropDragHandle=null; }));
-})();
-function confirmCrop(){
-  if(!cropImg || !cropRect) return;
-  const {left,top,right,bottom} = cropRect;
-  const w = Math.round(right-left), h = Math.round(bottom-top);
-  if(w<10 || h<10){ showToast('حدد مساحة أكبر للقص'); return; }
-  const out = document.createElement('canvas');
-  out.width = w; out.height = h;
-  out.getContext('2d').drawImage(cropImg, left, top, w, h, 0, 0, w, h);
-  const croppedDataUrl = out.toDataURL('image/jpeg', 0.92);
-  window._lastCroppedTileImage = croppedDataUrl;
-  if(window._cropMode === 'jabal-add'){
-    window._cropMode = null;
-    openJabalNamePrompt(croppedDataUrl);
+
+async function runAiTileVisualization(){
+  if(!tilePreview.roomImageData || !tilePreview.tileImageData){
+    showToast('الصورتين مطلوبتين لإتمام المعاينة');
     return;
   }
-  startAnalysis({type:'photo', data:croppedDataUrl});
-}
-
-/* ---------- Mark floor corners (draggable quad, any order, any time) ---------- */
-let markImg = null;
-let markPoints = null;
-let markDragIndex = null;
-
-function initMarkScreen(){
-  const canvas = document.getElementById('pvMarkCanvas');
-  const img = new Image();
-  img.onload = ()=>{
-    markImg = img;
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    if(tilePreview.points && tilePreview.points.length===4){
-      markPoints = tilePreview.points.map(p=>({x:p.x,y:p.y}));
-    } else {
-      resetMarkHandles();
-    }
-    drawMarkCanvas();
-  };
-  img.src = tilePreview.roomImageData;
-}
-function resetMarkHandles(){
-  if(!markImg) return;
-  const w = markImg.naturalWidth, h = markImg.naturalHeight;
-  markPoints = [
-    {x:w*0.22, y:h*0.55},
-    {x:w*0.78, y:h*0.55},
-    {x:w*0.95, y:h*0.92},
-    {x:w*0.05, y:h*0.92}
-  ];
-  drawMarkCanvas();
-}
-function drawMarkCanvas(){
-  const canvas = document.getElementById('pvMarkCanvas');
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(markImg, 0, 0);
-  if(!markPoints) return;
-  ctx.strokeStyle = 'rgba(232,163,61,0.9)';
-  ctx.lineWidth = Math.max(2, canvas.width*0.003);
-  ctx.beginPath();
-  markPoints.forEach((p,i)=> i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
-  ctx.closePath(); ctx.stroke();
-  ctx.fillStyle = 'rgba(232,163,61,0.15)';
-  ctx.fill();
-  const hs = Math.max(11, canvas.width*0.02);
-  markPoints.forEach((p,i)=>{
-    ctx.beginPath(); ctx.fillStyle = '#e8a33d';
-    ctx.arc(p.x,p.y,hs,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = `bold ${Math.round(hs*1.1)}px sans-serif`;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText((i+1), p.x, p.y);
-  });
-}
-function getMarkCanvasPoint(evt){
-  const canvas = document.getElementById('pvMarkCanvas');
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-  return { x:(evt.clientX-rect.left)*scaleX, y:(evt.clientY-rect.top)*scaleY };
-}
-(function setupMarkPointerEvents(){
-  const canvas = document.getElementById('pvMarkCanvas');
-  canvas.addEventListener('pointerdown', e=>{
-    if(!markPoints) return;
-    canvas.setPointerCapture(e.pointerId);
-    const p = getMarkCanvasPoint(e);
-    const hs = Math.max(22, canvas.width*0.04);
-    let closest=-1, closestDist=Infinity;
-    markPoints.forEach((mp,i)=>{
-      const d = Math.hypot(p.x-mp.x, p.y-mp.y);
-      if(d<hs && d<closestDist){ closest=i; closestDist=d; }
+  showToast('جاري تركيب البلاط بالذكاء الاصطناعي... قد يستغرق دقيقة');
+  try{
+    const res = await fetch(JABAL_SERVER_BASE + '/jabal-api/tile-visualize', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        apiKey: JABAL_API_KEY_CLIENT,
+        roomImageBase64: _jabalStripDataUrlPrefix(tilePreview.roomImageData),
+        tileImageBase64: _jabalStripDataUrlPrefix(tilePreview.tileImageData)
+      })
     });
-    markDragIndex = closest;
-  });
-  canvas.addEventListener('pointermove', e=>{
-    if(markDragIndex===null || markDragIndex<0) return;
-    const p = getMarkCanvasPoint(e);
-    markPoints[markDragIndex].x = Math.max(0, Math.min(canvas.width, p.x));
-    markPoints[markDragIndex].y = Math.max(0, Math.min(canvas.height, p.y));
-    drawMarkCanvas();
-  });
-  ['pointerup','pointercancel'].forEach(ev=>canvas.addEventListener(ev, ()=>{ markDragIndex=null; }));
-})();
-
-/* ---------- Generate the composite result ---------- */
-function generatePreviewResult(){
-  if(!markPoints || markPoints.length!==4){ showToast('حدد زوايا الأرضية أولاً'); return; }
-  tilePreview.points = markPoints.map(p=>({x:p.x,y:p.y}));
-  showToast('جاري تركيب البلاط...');
-  renderPvResult().then(()=>{
+    const data = await res.json();
+    if(!data.success) throw new Error(data.error || 'فشل تركيب البلاط');
+    tilePreview.resultDataUrl = 'data:image/jpeg;base64,' + data.resultImageBase64;
+    drawResultCanvasFromDataUrl();
     nav('screen-pv-result');
     beep();
-  }).catch(()=>{
-    showToast('حدث خطأ أثناء التركيب، حاول تعديل التحديد');
-  });
-}
-function renderPvResult(){
-  return new Promise((resolve, reject)=>{
-    try{
-      const W = markImg.naturalWidth, H = markImg.naturalHeight;
-      const canvas = document.getElementById('pvResultCanvas');
-      canvas.width = W; canvas.height = H;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(markImg, 0, 0);
-      const baseData = ctx.getImageData(0,0,W,H);
-
-      const tileImgEl = new Image();
-      tileImgEl.onload = ()=>{
-        try{
-          const tCanvas = document.createElement('canvas');
-          tCanvas.width = tileImgEl.naturalWidth; tCanvas.height = tileImgEl.naturalHeight;
-          const tctx = tCanvas.getContext('2d');
-          tctx.drawImage(tileImgEl, 0, 0);
-          const tileData = tctx.getImageData(0,0,tCanvas.width, tCanvas.height);
-
-          const pts = tilePreview.points;
-          const fwd = pvComputeSquareToQuad(pts[0], pts[1], pts[2], pts[3]);
-          const inv = pvInvert3x3(fwd);
-          const rx = tilePreview.repeatX, ry = tilePreview.repeatY, shade = tilePreview.shade/100;
-
-          const xs = pts.map(p=>p.x), ys = pts.map(p=>p.y);
-          const minX = Math.max(0, Math.floor(Math.min(...xs)));
-          const maxX = Math.min(W-1, Math.ceil(Math.max(...xs)));
-          const minY = Math.max(0, Math.floor(Math.min(...ys)));
-          const maxY = Math.min(H-1, Math.ceil(Math.max(...ys)));
-
-          const outData = ctx.getImageData(0,0,W,H);
-          function pointInQuad(x,y){
-            let inside=false;
-            for(let i=0,j=3;i<4;j=i++){
-              const xi=pts[i].x, yi=pts[i].y, xj=pts[j].x, yj=pts[j].y;
-              const intersect = ((yi>y)!==(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi);
-              if(intersect) inside=!inside;
-            }
-            return inside;
-          }
-          for(let y=minY;y<=maxY;y++){
-            for(let x=minX;x<=maxX;x++){
-              if(!pointInQuad(x,y)) continue;
-              const uv = pvApplyMatrix(inv, x, y);
-              let u=uv.x, v=uv.y;
-              if(u<0||u>1||v<0||v>1) continue;
-              let tu=(u*rx)%1; if(tu<0) tu+=1;
-              let tv=(v*ry)%1; if(tv<0) tv+=1;
-              const tx = Math.min(tCanvas.width-1, Math.floor(tu*tCanvas.width));
-              const ty = Math.min(tCanvas.height-1, Math.floor(tv*tCanvas.height));
-              const tIdx = (ty*tCanvas.width+tx)*4;
-              const oIdx = (y*W+x)*4;
-              const br=baseData.data[oIdx], bg=baseData.data[oIdx+1], bb=baseData.data[oIdx+2];
-              const lum = (0.299*br+0.587*bg+0.114*bb)/255;
-              const factor = 1 - shade + shade*(lum*1.6);
-              outData.data[oIdx]   = Math.min(255, tileData.data[tIdx]*factor);
-              outData.data[oIdx+1] = Math.min(255, tileData.data[tIdx+1]*factor);
-              outData.data[oIdx+2] = Math.min(255, tileData.data[tIdx+2]*factor);
-              outData.data[oIdx+3] = 255;
-            }
-          }
-          ctx.putImageData(outData, 0, 0);
-          tilePreview.resultDataUrl = canvas.toDataURL('image/jpeg', 0.92);
-          resolve();
-        }catch(err){ reject(err); }
-      };
-      tileImgEl.onerror = reject;
-      tileImgEl.src = tilePreview.tileImageData;
-    }catch(err){ reject(err); }
-  });
+  }catch(err){
+    console.error('[Jabal AI] خطأ:', err.message);
+    showToast('تعذّر تركيب البلاط، تأكد من الاتصال بالإنترنت وحاول مجددًا');
+  }
 }
 
 /* ---------- Fullscreen preview + save to المحفوظات ---------- */
