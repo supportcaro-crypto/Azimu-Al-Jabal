@@ -1335,11 +1335,10 @@ function handleCapturedPhoto(dataUrl){
   if(window._camMode === 'preview-room'){
     tilePreview.roomImageData = dataUrl;
     runAiTileVisualization();
+  } else if(window._camMode === 'jabal-add'){
+    openJabalNamePrompt(dataUrl);
   } else {
-    if(window._camMode === 'jabal-add'){ window._cropMode = 'jabal-add'; }
-    tilePreview.tileRawData = dataUrl;
-    nav('screen-pv-crop');
-    initCropScreen();
+    startAnalysis({type:'photo', data: dataUrl});
   }
 }
 
@@ -1795,9 +1794,7 @@ document.getElementById('previewFileInput').addEventListener('change', function(
       tilePreview.roomImageData = ev.target.result;
       runAiTileVisualization();
     } else if(_previewFileTarget === 'tile'){
-      tilePreview.tileRawData = ev.target.result;
-      nav('screen-pv-crop');
-      initCropScreen();
+      startAnalysis({type:'photo', data: ev.target.result});
     }
   };
   reader.readAsDataURL(file);
@@ -2035,10 +2032,7 @@ document.getElementById('jabalAddFileInput').addEventListener('change', function
   if(!file) return;
   const reader = new FileReader();
   reader.onload = function(ev){
-    tilePreview.tileRawData = ev.target.result;
-    window._cropMode = 'jabal-add';
-    nav('screen-pv-crop');
-    initCropScreen();
+    openJabalNamePrompt(ev.target.result);
   };
   reader.readAsDataURL(file);
   e.target.value = '';
