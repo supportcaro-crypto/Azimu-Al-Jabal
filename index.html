@@ -2105,7 +2105,10 @@ async function runAiTileVisualization(){
     if(data.roomImageUrl) pvLog('🖼️ رابط صورة الغرفة المُرسل للموديل: ' + data.roomImageUrl);
     if(data.tileImageUrl) pvLog('🧱 رابط صورة البلاطة المُرسل للموديل: ' + data.tileImageUrl);
     if(data.seedUsed) pvLog('🎲 seed المستخدم لهاد الطلب (لازم يختلف بكل محاولة): ' + data.seedUsed);
-    tilePreview.resultDataUrl = 'data:image/jpeg;base64,' + data.resultImageBase64;
+    // ⚠️ 2026-09-15: الموديل الجديد (Nano Banana عبر OpenRouter) بيرجّع PNG
+    // مش JPEG متل Pollinations قديماً — منستخدم resultMime يلي رجّعه
+    // السيرفر بدل ما نفرض jpeg دايماً.
+    tilePreview.resultDataUrl = 'data:' + (data.resultMime || 'image/png') + ';base64,' + data.resultImageBase64;
     drawResultCanvasFromDataUrl();
     // نضل واقفين هون بدل ما ننتقل عالنتيجة تلقائياً — هيك صندوق اللوغ
     // يضل ظاهر وتقدر تراجعه/تنسخه قبل ما تكمل. اضغط "عرض النتيجة" يدوياً.
