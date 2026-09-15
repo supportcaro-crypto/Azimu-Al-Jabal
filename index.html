@@ -887,6 +887,7 @@
             <pre id="pvLoadingLog"></pre>
           </div>
           <button class="btn-outline" id="pvLoadingRetryBtn" style="display:none;" onclick="runAiTileVisualization()">إعادة المحاولة</button>
+          <button class="btn-primary" id="pvLoadingProceedBtn" style="display:none;" onclick="pvProceedToResult()">عرض النتيجة</button>
         </div>
       </div>
     </div>
@@ -1891,13 +1892,26 @@ function pvCopyLog(){
   }
 }
 function pvSetLoadingUiState(state, statusMsg){
-  // state: 'loading' | 'error'
+  // state: 'loading' | 'error' | 'success'
   const spinner = document.getElementById('pvLoadingSpinner');
   const statusEl = document.getElementById('pvLoadingStatus');
   const retryBtn = document.getElementById('pvLoadingRetryBtn');
+  const proceedBtn = document.getElementById('pvLoadingProceedBtn');
   if(statusEl){ statusEl.textContent = statusMsg; statusEl.classList.toggle('err', state === 'error'); }
   if(spinner) spinner.style.display = (state === 'loading') ? '' : 'none';
   if(retryBtn) retryBtn.style.display = (state === 'error') ? '' : 'none';
+  if(proceedBtn) proceedBtn.style.display = (state === 'success') ? '' : 'none';
+}
+function pvProceedToResult(){
+  nav('screen-pv-result', true);
+}
+function pvLogRawJson(rawText){
+  // نقصّر أي base64 طويل (متل resultImageBase64 — ممكن يكون ميغابايت من
+  // النص) قبل ما نطبعه بصندوق اللوغ. تركه كامل بيبهدل الواجهة بدون أي
+  // فايدة تشخيصية إضافية (أصلاً الصورة نفسها بتنعرض بزر "عرض النتيجة").
+  const display = rawText.replace(/"([A-Za-z0-9+/=]{300,})"/g,
+    (m, b64) => `"<base64 — ${b64.length.toLocaleString('en-US')} حرف — مقصوص للعرض>"`);
+  pvLog(display);
 }
 
 async function runAiTileVisualization(){
@@ -1913,6 +1927,10 @@ async function runAiTileVisualization(){
   nav('screen-pv-loading', replaceScreen);
   pvLogClear();
   pvSetLoadingUiState('loading', 'جاري تركيب البلاط بالذكاء الاصطناعي... قد يستغرق دقيقة');
+  // ⚠️ ملاحظة صادقة: الـ API ما بترجّع أي حقل رسمي بيقول "الموديل استقبل
+  // N صورة" — أقصى شي منقدر نتحقق منه هو عدد الصور يلي *إحنا* بعتناها
+  // من طرفنا وروابطها الفعلية (تحت)، بعدين تفتحهن يدوياً للتأكد إنهم سليمين.
+  pvLog('📷 عدد الصور المرسلة من التطبيق: 2 (صورة الغرفة + صورة البلاطة)');
   pvLog('➡️ POST ' + JABAL_SERVER_BASE + '/jabal-api/tile-visualize');
   try{
     const res = await fetch(JABAL_SERVER_BASE + '/jabal-api/tile-visualize', {
@@ -1926,7 +1944,7 @@ async function runAiTileVisualization(){
     });
     const rawText = await res.text();
     pvLog('⬅️ HTTP ' + res.status + ' ' + res.statusText);
-    pvLog(rawText || '(رد فارغ بلا محتوى)');
+    pvLogRawJson(rawText || '(رد فارغ بلا محتوى)');
     let data;
     try{
       data = JSON.parse(rawText);
@@ -1934,9 +1952,13 @@ async function runAiTileVisualization(){
       throw new Error('الرد من السيرفر ليس JSON صالح (HTTP ' + res.status + ' ' + res.statusText + ') — شوف الصندوق أعلاه للرد الخام كامل');
     }
     if(!data.success) throw new Error(data.error || 'فشل تركيب البلاط');
+    if(data.roomImageUrl) pvLog('🖼️ رابط صورة الغرفة المُرسل للموديل: ' + data.roomImageUrl);
+    if(data.tileImageUrl) pvLog('🧱 رابط صورة البلاطة المُرسل للموديل: ' + data.tileImageUrl);
     tilePreview.resultDataUrl = 'data:image/jpeg;base64,' + data.resultImageBase64;
     drawResultCanvasFromDataUrl();
-    nav('screen-pv-result', true);
+    // نضل واقفين هون بدل ما ننتقل عالنتيجة تلقائياً — هيك صندوق اللوغ
+    // يضل ظاهر وتقدر تراجعه/تنسخه قبل ما تكمل. اضغط "عرض النتيجة" يدوياً.
+    pvSetLoadingUiState('success', 'تم تركيب البلاط بنجاح ✅ — راجع اللوغ فوق ثم اضغط "عرض النتيجة"');
     beep();
   }catch(err){
     // خطأ شبكة (fetch نفسه رمى استثناء قبل ما يوصل رد أصلاً) بيوصل هون
