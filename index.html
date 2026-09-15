@@ -564,6 +564,9 @@
     color:#8fe0a0; white-space:pre-wrap; word-break:break-all;
   }
 
+  /* ---------- Tile crop screen (يقصّ صورة البلاطة قبل إرسالها للذكاء الاصطناعي) ---------- */
+  #pvCropCanvas{ touch-action:none; cursor:crosshair; }
+
   input[type=file]{ display:none; }
   ::selection{ background:var(--blue); color:#fff; }
 
@@ -1747,14 +1750,161 @@ function proceedToVisualizationFromDetail(){
     return;
   }
   const {rx, ry} = computeAutoRepeats(calc);
+  // 🆕 قبل ما نروح لتصوير الغرفة، لازم نمرّ بشاشة قص صورة البلاطة أولاً —
+  // الصورة الخام يلي عم توصلنا هون هي نفس صورة عدّ البلاط (زاوية بعيدة،
+  // فيها خلفية/أرضية حوالين البلاطة)، ومنيح تُرسل للذكاء الاصطناعي متل
+  // ما هي لأنه البرومت بيطلب "close-up sample" نظيف بدون خلفية — القص
+  // هون هو يلي بيعزل وجه البلاطة فعلياً قبل التوليد.
   tilePreview = {
     roomImageData:null,
     tileRawData:null,
-    tileImageData: tileImg,
+    tileImageData:null,
     points:null,
     repeatX: rx, repeatY: ry, shade:0,
     resultDataUrl:null
   };
+  openTileCropScreen(tileImg);
+}
+
+/* ---------- شاشة قص صورة البلاطة (4 زوايا صفراء قابلة للسحب) ---------- */
+const pvCrop = { img:null, natW:0, natH:0, handles:null, dragIdx:null };
+function pvCropDefaultHandles(w, h){
+  // مستطيل افتراضي بمنتصف الصورة بهامش 15% من كل جهة
+  const mx = w*0.15, my = h*0.15;
+  return [
+    {x:mx,   y:my},    // أعلى-يسار
+    {x:w-mx, y:my},    // أعلى-يمين
+    {x:w-mx, y:h-my},  // أسفل-يمين
+    {x:mx,   y:h-my}   // أسفل-يسار
+  ];
+}
+function openTileCropScreen(dataUrl){
+  const img = new Image();
+  img.onload = function(){
+    // نحدّ أقصى بُعد بـ 900px حتى ما يصير الكانفاس ثقيل عالجوال، بدون
+    // ما نأثر عالنسبة الحقيقية للصورة.
+    const maxDim = 900;
+    const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+    const w = Math.round(img.naturalWidth * scale);
+    const h = Math.round(img.naturalHeight * scale);
+    pvCrop.img = img;
+    pvCrop.natW = w;
+    pvCrop.natH = h;
+    pvCrop.handles = pvCropDefaultHandles(w, h);
+    pvCrop.dragIdx = null;
+    const canvas = document.getElementById('pvCropCanvas');
+    canvas.width = w;
+    canvas.height = h;
+    pvDrawCropOverlay();
+    nav('screen-pv-crop');
+  };
+  img.onerror = function(){
+    showToast('تعذّر تحميل صورة البلاطة للقص');
+  };
+  img.src = dataUrl;
+}
+function pvDrawCropOverlay(){
+  const canvas = document.getElementById('pvCropCanvas');
+  if(!canvas || !pvCrop.img) return;
+  const ctx = canvas.getContext('2d');
+  const w = pvCrop.natW, h = pvCrop.natH;
+  ctx.clearRect(0,0,w,h);
+  ctx.drawImage(pvCrop.img, 0, 0, w, h);
+  const [p0,p1,p2,p3] = pvCrop.handles;
+  const minX = Math.min(p0.x,p1.x,p2.x,p3.x), maxX = Math.max(p0.x,p1.x,p2.x,p3.x);
+  const minY = Math.min(p0.y,p1.y,p2.y,p3.y), maxY = Math.max(p0.y,p1.y,p2.y,p3.y);
+  // تعتيم كل شي خارج مستطيل التحديد
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(0, 0, w, minY);
+  ctx.fillRect(0, maxY, w, h-maxY);
+  ctx.fillRect(0, minY, minX, maxY-minY);
+  ctx.fillRect(maxX, minY, w-maxX, maxY-minY);
+  // حدود مستطيل التحديد
+  ctx.strokeStyle = '#ffe600';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(minX, minY, maxX-minX, maxY-minY);
+  // الزوايا الصفراء
+  const r = Math.max(9, Math.round(w*0.018));
+  [p0,p1,p2,p3].forEach(p=>{
+    ctx.beginPath();
+    ctx.fillStyle = '#ffe600';
+    ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#0a2a4d';
+    ctx.stroke();
+  });
+}
+function pvCanvasEventPoint(e){
+  const canvas = document.getElementById('pvCropCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+}
+function pvCropHandleAt(pt){
+  const hitR = Math.max(24, pvCrop.natW*0.05);
+  let closestIdx = null, closestDist = hitR;
+  pvCrop.handles.forEach((h, i)=>{
+    const d = Math.hypot(h.x-pt.x, h.y-pt.y);
+    if(d <= closestDist){ closestDist = d; closestIdx = i; }
+  });
+  return closestIdx;
+}
+(function setupCropCanvasEvents(){
+  const canvas = document.getElementById('pvCropCanvas');
+  if(!canvas) return;
+  canvas.addEventListener('pointerdown', e=>{
+    if(!pvCrop.handles) return;
+    const pt = pvCanvasEventPoint(e);
+    const idx = pvCropHandleAt(pt);
+    if(idx !== null){
+      pvCrop.dragIdx = idx;
+      canvas.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    }
+  });
+  canvas.addEventListener('pointermove', e=>{
+    if(pvCrop.dragIdx === null || !pvCrop.handles) return;
+    const pt = pvCanvasEventPoint(e);
+    pvCrop.handles[pvCrop.dragIdx] = {
+      x: Math.max(0, Math.min(pvCrop.natW, pt.x)),
+      y: Math.max(0, Math.min(pvCrop.natH, pt.y))
+    };
+    pvDrawCropOverlay();
+    e.preventDefault();
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(evt=>{
+    canvas.addEventListener(evt, ()=>{ pvCrop.dragIdx = null; });
+  });
+})();
+function resetCropHandles(){
+  if(!pvCrop.natW) return;
+  pvCrop.handles = pvCropDefaultHandles(pvCrop.natW, pvCrop.natH);
+  pvDrawCropOverlay();
+}
+function confirmCrop(){
+  if(!pvCrop.img || !pvCrop.handles){ showToast('حصل خطأ، حاول مجدداً'); return; }
+  const [p0,p1,p2,p3] = pvCrop.handles;
+  const minX = Math.min(p0.x,p1.x,p2.x,p3.x), maxX = Math.max(p0.x,p1.x,p2.x,p3.x);
+  const minY = Math.min(p0.y,p1.y,p2.y,p3.y), maxY = Math.max(p0.y,p1.y,p2.y,p3.y);
+  const cw = maxX-minX, ch = maxY-minY;
+  if(cw < 20 || ch < 20){ showToast('حدّد منطقة أكبر شوي من البلاطة'); return; }
+  // نحسب المقياس بين أبعاد الكانفاس المعروضة (pvCrop.natW/H — ممكن مصغّرة
+  // لـ900px) وأبعاد الصورة الأصلية الحقيقية، حتى نقص من الصورة الأصلية
+  // بأعلى جودة متوفرة بدل ما نقص من نسخة مصغّرة.
+  const realScaleX = pvCrop.img.naturalWidth / pvCrop.natW;
+  const realScaleY = pvCrop.img.naturalHeight / pvCrop.natH;
+  const sx = minX*realScaleX, sy = minY*realScaleY, sw = cw*realScaleX, sh = ch*realScaleY;
+  const outMax = 800; // حجم كافٍ لعيّنة لون/نسيج واضحة بدون ملف ثقيل
+  const outScale = Math.min(1, outMax / Math.max(sw, sh));
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = Math.max(1, Math.round(sw*outScale));
+  outCanvas.height = Math.max(1, Math.round(sh*outScale));
+  const octx = outCanvas.getContext('2d');
+  octx.drawImage(pvCrop.img, sx, sy, sw, sh, 0, 0, outCanvas.width, outCanvas.height);
+  const croppedDataUrl = outCanvas.toDataURL('image/jpeg', 0.92);
+  tilePreview.tileImageData = croppedDataUrl;
   openCamera('preview-room');
 }
 
