@@ -2104,6 +2104,7 @@ async function runAiTileVisualization(){
     if(!data.success) throw new Error(data.error || 'فشل تركيب البلاط');
     if(data.roomImageUrl) pvLog('🖼️ رابط صورة الغرفة المُرسل للموديل: ' + data.roomImageUrl);
     if(data.tileImageUrl) pvLog('🧱 رابط صورة البلاطة المُرسل للموديل: ' + data.tileImageUrl);
+    if(data.seedUsed) pvLog('🎲 seed المستخدم لهاد الطلب (لازم يختلف بكل محاولة): ' + data.seedUsed);
     tilePreview.resultDataUrl = 'data:image/jpeg;base64,' + data.resultImageBase64;
     drawResultCanvasFromDataUrl();
     // نضل واقفين هون بدل ما ننتقل عالنتيجة تلقائياً — هيك صندوق اللوغ
